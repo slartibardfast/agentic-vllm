@@ -93,3 +93,9 @@
     evidence = 1 item(s) realized for vllm at pin 79378fe6e876 (reference)
     tool = host-lifecycle@0.50.0
     recorded = 2026-08-27
+
+[receipt "remap"]
+    disposition = done
+    evidence = rename map empty; audit clean with the measured-quantity lexicon entries
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
