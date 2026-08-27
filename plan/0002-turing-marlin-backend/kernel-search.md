@@ -57,8 +57,8 @@ Raw data: `config-table-*.json` beside the harness. Reading:
 - `bm64_bn64_w8` (eight warps, two column halves, 256 threads) is the most
   steady candidate everywhere except the largest M, where
   `bm64_bn128_w8` takes the lead.
-- The worst-case relative scores (0.39 to 0.81 across candidates) confirm
-  the plan's premise: no single configuration is uniformly dominant, so a
+- The worst-case relative scores span roughly four tenths to four
+  fifths of the best per shape, confirming the plan's premise: no single configuration is uniformly dominant, so a
   per-M-regime table is real work, not ceremony.
 - Absolute numbers remain reference-grade (tens of TFLOP/s): single-stage
   staging, no split-K, one weight read per block. The table's STRUCTURE is
