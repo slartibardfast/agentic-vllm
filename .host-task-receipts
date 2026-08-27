@@ -4,3 +4,10 @@
     evidence = suite in turing_lab on branch sm75-marlin; full protocol plus shared lanes recorded in tu102-characterization.md; smoke verify green
     tool = host-lifecycle@0.50.0
     recorded = 2026-08-27
+
+[receipt "plan/0002#tu102-characterization"]
+    disposition = done
+    verify = cd software/vllm/sm75-marlin && python3 turing_lab/run_all.py --smoke
+    evidence = suite in turing_lab on branch sm75-marlin; full protocol plus shared lanes in tu102-characterization.md; smoke verify green
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
