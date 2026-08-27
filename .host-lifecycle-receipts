@@ -81,3 +81,9 @@
     reason = no release has been made; the phase runs at the component's first release
     tool = host-lifecycle@0.50.0
     recorded = 2026-08-27
+
+[receipt "verify"]
+    disposition = done
+    evidence = validate, prose, reconcile, and refs --gate all green at re-recording time
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
