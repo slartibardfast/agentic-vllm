@@ -28,9 +28,16 @@ reflects the hardware and not the toolchain. Aligned on 2026-08-27.
 
 - rope boots with systemd-boot, default entry `arch-linux-lts.conf` (created
   2026-08-27; kernel options copied from the previous mainline boot). The
-  mainline UKI (`arch-linux.efi`) stays installed as a fallback, and its DKMS
-  module is kept at the same driver version, so the fallback still drives the
-  GPU if the LTS boot ever fails.
+  default is persisted twice: as the `default` line in
+  `/boot/loader/loader.conf` and in the firmware's
+  `LoaderEntryDefault` variable, so a firmware reset cannot silently fall
+  back to the mainline kernel. The mainline UKI (`arch-linux.efi`) stays
+  installed as a fallback, and its DKMS module is kept at the same driver
+  version, so the fallback still drives the GPU if the LTS boot ever fails.
+- This host boots systemd-boot with `default arch-lts.conf`, which points at
+  the stable filenames `vmlinuz-linux-lts` and `initramfs-linux-lts.img`; the
+  package upgrade needed no loader change, and the next reboot picks up the
+  newer point release.
 - This host runs the previous LTS point release (`6.18.46-1-lts`) until its
   next reboot; the installed package is already `6.18.47-1`. The driver and
   the CUDA toolkit are userspace components and are identical today, which is
