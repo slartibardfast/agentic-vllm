@@ -1,0 +1,38 @@
+# Software-under-test recipe. Each [software "<name>"] stanza is materialized
+# locally under software/<name>/ as a bare object store .bare/ with a .git
+# gitdir-link file beside it, plus the canonical worktree at
+# software/<name>/<branch>/ and any parallel branch worktrees, all gitignored.
+# The pin replaces a submodule gitlink as the reproducibility anchor.
+[software "vllm"]
+	# Migrated software (it predates this host): its release artifacts are built
+	# in upstream GPU images this host does not operate, so the reproducibility
+	# property is waived by the case decision below rather than met.
+	url          = https://github.com/vllm-project/vllm.git
+	pin          = 79378fe6e87687c63ceab9815c68bf027d491868
+	worktrees    =
+	repro-waiver = call/0002
+
+[software "host-lint"]
+	# The commit gate. hooks = pre-commit makes --install-hooks copy this
+	# component's dispatch script and its binary into .git/hooks here and into
+	# every materialized worktree. The artifact hash is the published
+	# linux-amd64 release binary (the host install manifest carries it).
+	url       = https://github.com/connollydavid/host-lint.git
+	pin       = 966259fb2001d0a4f6bdf3ae608ddd1c36c309d0
+	worktrees =
+	toolchain = 1.95.0
+	build     = cargo build --release --locked
+	deploy    = host-lint
+	artifact  = target/release/host-lint 5ea6e94d17e7a860c9809728eee988f23caffe45e2d958628835fd44271ec645
+	hooks     = pre-commit
+
+[software "host-lifecycle"]
+	# The lifecycle binary the phases run through. Recorded so the gate can
+	# verify the local binary against the published release the same way.
+	url       = https://github.com/connollydavid/host-lifecycle.git
+	pin       = 66c24d6de0833b8bafc58c5c875ab23b9303c47a
+	worktrees =
+	toolchain = 1.95.0
+	build     = cargo build --release --locked
+	deploy    = host-lifecycle
+	artifact  = target/release/host-lifecycle bd701a3723211f71787714d32b70c2be2e39a0b1c5ff5c4c4ca44b1baf8192e1
