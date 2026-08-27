@@ -72,8 +72,34 @@ M* = machine balance / arithmetic intensity coefficient
 from the supplied model's 44. Treat 47 as the initial regime-separation
 hypothesis for the M-sweep task; it is a model output, not a constant.
 
+## Shared-memory path and staging (second sweep, 2026-08-27)
+
+| lane | measured |
+|---|---|
+| STS, conflict-free float4 | 9959 GB/s |
+| STS, 34-float conflict stride | 5399 GB/s |
+| ldmatrix x4 | 6.41e9 loads/s (about 3.3 TB/s shared read) |
+| staging chain LDG-STS-barrier-consume | 558 GB/s |
+| HMMA at 1 block of 8 warps per SM | 43.8 TFLOP/s |
+| HMMA at 2+ blocks per SM | 101.7 TFLOP/s (flat to 16) |
+
+Findings:
+
+5. **Bank conflicts halve STS.** The swizzle search in the kernel-design
+   space has a hard ceiling proof: a conflicted mapping pays about half.
+6. **The no-cp.async staging chain is bandwidth-bound at this footprint**
+   (558 GB/s tracks the global read), so the Turing pipeline pays for
+   registers and barriers, not for lost bandwidth; the cost shows up in
+   occupancy instead (finding 7).
+7. **The tensor pipes need two resident blocks per SM.** One block of eight
+   warps reaches 43.8 TFLOP/s; two blocks reach the 101.7 ceiling and it
+   stays flat to sixteen blocks. This is a hard occupancy constraint for
+   the generated configuration table: any config whose shared-memory and
+   register footprint allows only one resident block cannot reach the
+   pipes' ceiling.
+
 ## Open lanes (characterization task stays open)
 
-STS and LDSM throughput, shared-memory staging chains, bank-conflict
-mapping, warp-scaling curves, and the M-sweep that tests the crossover
-prediction against real Marlin shapes.
+The M-sweep that tests the crossover prediction against real Marlin shapes
+belongs to the reference-backend and search tasks, which own a kernel to
+sweep.

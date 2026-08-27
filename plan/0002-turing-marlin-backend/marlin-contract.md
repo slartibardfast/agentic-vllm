@@ -66,14 +66,86 @@ The kernel-selection architecture is `MPLinearKernel` subclasses chosen by
 The exact extension point is an integration decision recorded before the
 dense integration task starts.
 
-## Open sections (in progress)
+## Weight repack (completed)
 
-- Repack formats: the exact `qweight` layouts produced by
-  `gptq_marlin_repack` / `awq_marlin_repack`, and what a Turing-specific
-  layout would have to preserve.
-- MoE: `marlin_moe.py` backend selection, expert weight semantics, and the
-  grouped GEMM entry in `csrc/libtorch_stable/moe/marlin_moe_wna16/`.
-- Configuration table: the full `thread_config_t` space and the selection
-  function in `marlin.cu`, as the baseline for the generated Turing table.
-- Numerical semantics: accumulation order and scale application points, to be
-  pinned down so the reference backend can be checked against them.
+The repack kernels (`gptq_marlin_repack.cu`, `awq_marlin_repack.cu`) are
+themselves cp.async pipelined transpose kernels. The target tile geometry is
+defined in `marlin.cuh`: `tile_k_size` (the architecture tile) and
+`tile_n_size = 4 * tile_k_size`; for 8-bit activations the effective tile
+doubles in K and halves in N (`is_a_8bit` flips both constants). The source
+layout is GPTQ/AWQ canonical: 4-bit values packed `pack_factor = 32/num_bits`
+per 32-bit word, K-major. The repack reorders values into the k-tile-major
+Marlin layout the kernel's B fragment walks consume directly, optionally
+applying the activation-order `perm` during the transpose (`has_perm`), with
+its own multi-stage shared-memory pipeline (`repack_stages`, double
+buffering). A Turing-specific layout, if measurements ever demand one,
+enters exactly here: a sibling repack kernel plus a kernel-side fragment
+walk; every upstream producer stays untouched.
+
+## Kernel selection and configuration table (completed)
+
+`marlin.cu` carries two priority-ordered thread-configuration tables:
+
+```
+small_batch (thread_m_blocks == 1):
+    {thread_k 128, thread_n 128, 256 threads}
+    {thread_k 64,  thread_n 128, 128 threads}
+    {thread_k 128, thread_n 64,  128 threads}
+large_batch (thread_m_blocks > 1):
+    {thread_k 64,  thread_n 256, 256 threads}
+    {thread_k 64,  thread_n 128, 128 threads}
+    {thread_k 128, thread_n 64,  128 threads}
+```
+
+`determine_exec_config` walks the table and returns the **first** config
+that passes `is_valid_config` (dimension divisibility, minimum thread
+constraints, shared-memory fit against `max_shared_mem - 512`, group-size
+and act-order constraints) and has a compiled kernel instantiation. There is
+no measurement-derived table for any architecture in this version: selection
+is validity-first in a fixed priority order. This is exactly the gap the
+generated Turing table fills: same machinery, table contents produced by the
+search harness rather than by hand.
+
+## Numerical semantics (completed)
+
+- Weights are unsigned 4-bit (`kU4B8`, GPTQ style) dequantized by the LUT
+  path in `dequant.h`: `lop3` masks nibbles into halves that carry the FP16
+  exponent bias 0x6400 (1024), so one instruction pair yields `1024 + q`
+  per nibble.
+- Two scale-application modes exist, selected per weight type
+  (`skip_flop`): fold the correction into the scale at load time
+  (`w = bit_op(q) * (scale * multiplier)`, zero FP16 sub/fma per value) or
+  explicit `__hsub2`/`__hfma2` per value (`SUB = 0x64086408` removes the
+  1024 bias and the 8 of `q - 8`). This is the dequant instruction-count
+  trade the contention measurements price.
+- Accumulation: HMMA fragments accumulate in FP32 (or FP16 on Turing with
+  `use_fp16_accum`); cross-thread-block partial sums reduce either in FP16
+  with global locks or in FP32 via `use_fp32_reduce` (workspace `C_tmp`),
+  and `use_atomic_add` switches the split-K reduction to atomics.
+- Group semantics: scales cover `group_size` K-elements
+  (`group_blocks = group_size/16` shared tiles, or `-1` for per-tensor),
+  applied from `b_s`/`g_s` fragments after the MMA, in the accumulator
+  domain, per 16-row fragment row.
+- Output: FP16/FP8 (`c_type`), optional bias (`b_bias`), written per
+  16×8 fragment tile; `workspace` (zeroed by the caller,
+  `marlin_make_workspace_new`) backs the global reduction locks.
+
+## MoE (completed)
+
+`marlin_moe.py` exposes `fused_marlin_moe` and `batched_fused_marlin_moe`,
+both funneling into `_fused_marlin_moe` and the `marlin_moe_gemm` custom op
+over `MarlinExpertsBase` (a `FusedMoEExpertsModular` subclass whose
+`_supports_*` predicates gate device and quant scheme). Semantics: expert
+weights in the same Marlin packed format (`w13`/`w2`, num_bits 4 or 8),
+grouped/batched GEMM over the routed expert list, top-k weights applied
+outside the kernel. A Turing MoE path reuses the dense Turing GEMM behind
+the same expert interface; no separate MoE kernel architecture is planned.
+
+## Runtime requirements (completed)
+
+The dense custom op (`marlin_gemm` in `vllm/_custom_ops.py`, wrapping
+`marlin_mm`) takes caller-preallocated workspace and reduction buffers, has
+no data-dependent allocations, and performs no host synchronization in the
+launch path, which is what CUDA graph capture requires. `thread_k_init`/
+`thread_n_init` may pin a configuration; `sms` may pin the SM count.
+
