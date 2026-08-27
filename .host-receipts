@@ -1,0 +1,18 @@
+applied = RETIRE-hermetic-exempt recorded=2026-08-27 via=verify
+applied = RENAME-repro-waiver recorded=2026-08-27 via=verify
+applied = REFS-a-number-resolves recorded=2026-08-27 via=verify
+applied = GATE-refs-in-verify recorded=2026-08-27 via=verify
+applied = LEXICON-declaration-is-a-report recorded=2026-08-27 via=verify
+applied = PIN-two-surfaces-two-claims recorded=2026-08-27 via=verify
+
+[receipt "adopt"]
+    disposition = done
+    evidence = rooms scaffolded and the stamp written at revision 44b4c84
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "upgrade"]
+    disposition = done
+    evidence = stamp migrated to baseline e4ed590; six ledger entries applied and recorded
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
