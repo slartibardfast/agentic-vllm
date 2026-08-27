@@ -65,10 +65,10 @@ verify that description against the pin before building on it.
 
 ### Reconstruct the Marlin contract {#marlin-contract}
 
-Trace the complete path from quantized model to output at the pin, once per
-dense quantization format and once for Marlin MoE. The dense formats at the
-pin are the GPTQ and AWQ Marlin variants. The stages, in the order the code
-executes them:
+Trace the whole Marlin pipeline at the pin, once per dense quantization
+format. Trace the MoE path the same way. The dense
+quantization formats at the pin are the Marlin variants of GPTQ and of AWQ.
+The stages, in the order the code executes them:
 
 ```
 weight loading -> repack -> kernel selection -> custom op -> kernel -> tile configuration -> output
