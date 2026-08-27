@@ -97,7 +97,7 @@ contention mixes (HMMA against HFMA2, FFMA, integer unpack, LDSM, LDG, STS);
 the hypothesis that FP16 arithmetic contends with HMMA on a shared execution
 resource is to be validated, not assumed.
 
-- verify: cd software/vllm/main && python3 turing_lab/run_all.py --smoke
+- verify: cd software/vllm/sm75-marlin && python3 turing_lab/run_all.py --smoke
 - depends: #marlin-contract
 
 ### Model the Turing Marlin regimes {#performance-model}
