@@ -55,7 +55,7 @@ carries six `__CUDA_ARCH__ == 750` blocks.
 - declares its minimum capability via `get_min_capability` (value to be
   recorded during integration; the sm_80+ guard lives kernel-side at 750);
 - allocates its workspace once per process with `marlin_make_workspace_new`,
-  reusing existing storage on weight reload;
+  and it reuses that storage on weight reload;
 - `apply_weights` invokes the custom op (`ops.gptq_marlin_gemm` family) with
   that preallocated workspace, so the launch path carries no allocation and
   no host synchronization, which is what makes CUDA graph capture legal.
