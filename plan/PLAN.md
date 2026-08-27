@@ -5,3 +5,4 @@ their folders are named `NNNN-slug` (zero-padded, and the number is identity, no
 sort key; see `call/0000`). A milestone is a thin, persona-serving increment.
 
 - [0001 example milestone](0001-example-milestone/README.md)
+- [0002 turing marlin backend](0002-turing-marlin-backend/README.md)
