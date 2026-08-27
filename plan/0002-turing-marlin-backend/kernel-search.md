@@ -39,7 +39,8 @@ warp covers `BN/WARPS_N` columns as `m16n8k8` fragments.
 Adversarial set: N 4096 and the awkward N 4160, K 4096, M in {1, 8, 32,
 128, 512}; median of 10 after warmup, locked clocks. Selection is minimax
 over per-shape RELATIVE TFLOP/s (each candidate against the best seen for
-the same shape), so the memory-bound M 1 rows cannot dominate.
+the same shape), so the memory-bound M 1 rows cannot dominate. The
+selection metric is the worst case over the shape set, not the mean.
 
 ## Generated table (first generation)
 
@@ -54,7 +55,7 @@ the same shape), so the memory-bound M 1 rows cannot dominate.
 Raw data: `config-table-*.json` beside the harness. Reading:
 
 - `bm64_bn64_w8` (eight warps, two column halves, 256 threads) is the most
-  robust candidate everywhere except the largest M, where
+  steady candidate everywhere except the largest M, where
   `bm64_bn128_w8` takes the lead.
 - The worst-case relative scores (0.39 to 0.81 across candidates) confirm
   the plan's premise: no single configuration is uniformly dominant, so a
