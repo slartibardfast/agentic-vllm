@@ -1,0 +1,83 @@
+[receipt "materialize" "vllm"]
+    disposition = done
+    evidence = 2 item(s) realized for vllm at pin 79378fe6e876 (reference)
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "materialize" "host-lint"]
+    disposition = done
+    evidence = 2 item(s) realized for host-lint at pin 966259fb2001 (reference); toolchain 1.95.0
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "materialize" "host-lifecycle"]
+    disposition = done
+    evidence = 2 item(s) realized for host-lifecycle at pin 66c24d6de083 (reference); toolchain 1.95.0
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "classify"]
+    disposition = done
+    evidence = preview ran on the empty tree and printed case a; the stamp is present now, so the recheck prints c and exits zero
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "embed" "vllm"]
+    disposition = done
+    evidence = pin 79378fe recorded; bare store and canonical worktree materialized at the pin
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "embed" "host-lint"]
+    disposition = done
+    evidence = pin 966259f recorded; bare store and canonical worktree materialized at the pin
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "embed" "host-lifecycle"]
+    disposition = done
+    evidence = pin 66c24d6 recorded; bare store and canonical worktree materialized at the pin
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "remap"]
+    disposition = done
+    evidence = rename map empty; the audit is clean with no dictionary
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "verify"]
+    disposition = done
+    evidence = validate, prose, reconcile, and refs --gate all green at recording time
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "publish"]
+    disposition = done
+    evidence = book.toml and the mdBook source generated; book --check green; a site CI lane waits until the project has a remote
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "release"]
+    disposition = skip
+    reason = no component has been released; the phase runs per component at its first release
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "release" "vllm"]
+    disposition = skip
+    reason = no release has been made; the phase runs at the component's first release
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "release" "host-lint"]
+    disposition = skip
+    reason = no release has been made; the phase runs at the component's first release
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
+
+[receipt "release" "host-lifecycle"]
+    disposition = skip
+    reason = no release has been made; the phase runs at the component's first release
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
