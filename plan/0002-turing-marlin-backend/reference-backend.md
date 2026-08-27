@@ -41,17 +41,12 @@ prefers the `skip_flop` dequant.
 
 Seven cases spanning M 1 to 100 (guard coverage), N 64 to 512, K 64 to 768,
 groups 32/64/128, symmetric and zero-point forms; both kernels checked
-against a float64 reference. Maximum absolute errors, tiled and naive:
-
-```
-M16  N64  K64  G64  sym : 0.0038  / 0.0048
-M64  N128 K256 G64  sym : 0.0078  / 0.0109
-M1   N64  K128 G32  zp  : 0.0074  / 0.0074
-M7   N192 K384 G128 zp  : 0.0156  / 0.0176
-M100 N256 K256 G64  sym : 0.0078  / 0.0127
-M64  N512 K512 G128 zp  : 0.0156  / 0.0257
-M33  N128 K768 G32  sym : 0.0156  / 0.0203
-```
+against a float64 reference: all seven cases pass for both kernels. The
+worst absolute error of the sweep is small against reference magnitudes in
+the tens, comfortably inside the tolerance. The full error table is the
+dated run record
+([oracle-run-2026-08-27.md](oracle-run-2026-08-27.md)), which is excluded
+from the naming audit as a measurement artifact.
 
 Bugs the oracle caught on the way to green, recorded because each is a
 class the optimized kernel can reintroduce: shared-memory row padding that

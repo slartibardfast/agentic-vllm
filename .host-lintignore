@@ -18,3 +18,6 @@ mdBook/
 # excluded by construction whether or not it is listed; the entry makes the
 # exclusion visible.
 MEMORY.md
+
+# Dated measurement artifacts: frozen records of benchmark and oracle runs.
+plan/*/oracle-run-*.md
