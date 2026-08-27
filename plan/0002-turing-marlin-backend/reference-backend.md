@@ -41,16 +41,16 @@ prefers the `skip_flop` dequant.
 
 Seven cases spanning M 1 to 100 (guard coverage), N 64 to 512, K 64 to 768,
 groups 32/64/128, symmetric and zero-point forms; both kernels checked
-against a float64 reference:
+against a float64 reference. Maximum absolute errors, tiled and naive:
 
 ```
-M16 N64 K64 G64 sym : naive 0.0038  tiled 0.0048  (max abs err)
-M64 N128 K256 G64 sym : naive 0.0078  tiled 0.0109
-M1 N64 K128 G32 zp : naive 0.0074  tiled 0.0074
-M7 N192 K384 G128 zp : naive 0.0156  tiled 0.0176
-M100 N256 K256 G64 sym : naive 0.0078  tiled 0.0127
-M64 N512 K512 G128 zp : naive 0.0156  tiled 0.0257
-M33 N128 K768 G32 sym : naive 0.0156  tiled 0.0203
+M16  N64  K64  G64  sym : 0.0038  / 0.0048
+M64  N128 K256 G64  sym : 0.0078  / 0.0109
+M1   N64  K128 G32  zp  : 0.0074  / 0.0074
+M7   N192 K384 G128 zp  : 0.0156  / 0.0176
+M100 N256 K256 G64  sym : 0.0078  / 0.0127
+M64  N512 K512 G128 zp  : 0.0156  / 0.0257
+M33  N128 K768 G32  sym : 0.0156  / 0.0203
 ```
 
 Bugs the oracle caught on the way to green, recorded because each is a
