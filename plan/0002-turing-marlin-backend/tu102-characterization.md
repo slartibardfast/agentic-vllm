@@ -20,9 +20,10 @@ Findings:
    at the same rate. The incumbent's Turing-only `use_fp16_accum` therefore
    buys register footprint, not throughput, and a new backend can keep FP32
    accumulators without paying for it.
-2. **INT8 is exactly twice FP16**, at 95 percent of the theoretical 214.5
-   TOPS the supplied research cites. The FP16 ceiling of roughly 101 TFLOP/s
-   at 1455 MHz matches that research's 107.2 figure to within 6 percent.
+2. **INT8 is exactly twice FP16**, at 95 percent of
+   the theoretical 214.5 TOPS the supplied research cites. The FP16 ceiling
+   of roughly 101 TFLOP/s at 1455 MHz matches that research's 107.2 figure
+   to within 6 percent.
 3. **The s4 MMA does not exist on sm_75 through the sanctioned interface.**
    ptxas rejects `.s4` as an instruction type for `mma.m8n8k16` on this
    target ("incorrect instruction type"). A W4A16 Turing backend must
