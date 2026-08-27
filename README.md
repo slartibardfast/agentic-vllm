@@ -12,8 +12,11 @@ map of the rooms:
 - `cast/` holds the personas: the people the software serves
 - `plan/` holds the milestones, one folder per milestone
 - `call/` holds the decisions, in MADR format
-- `software/` holds the hosted software (gitignored, materialized locally)
-- `tools/` holds the verification tools as pinned submodules
+- `software/` holds the hosted components, materialized locally from the
+  recipe in `.host-software`: vLLM, and the two gate tools this host executes
+  (host-lint, host-lifecycle)
+- `tools/` holds the tools this host consumes as pinned submodules: allium,
+  specula
 
 Setup on a fresh machine:
 
