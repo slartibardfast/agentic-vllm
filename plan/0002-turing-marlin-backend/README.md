@@ -32,8 +32,12 @@ Turing inference engine.
 
 | rig | GPU | arch | clocks | role |
 |---|---|---|---|---|
-| this host | 2× Quadro RTX 6000, 24 GB | sm_75, driver 610.57.04, CUDA 13.3 | locked 1455 MHz | target |
-| rope (192.168.178.60) | RTX 3060 Ti, 8 GB | sm_86, driver 610.43.02 | locked 1665 MHz | native Ampere reference |
+| this host | 2× Quadro RTX 6000, 24 GB | sm_75, driver 610.57.04, CUDA 13.3.1 | locked 1455 MHz | target |
+| rope (192.168.178.60) | RTX 3060 Ti, 8 GB | sm_86, driver 610.57.04, CUDA 13.3.1 | locked 1665 MHz | native Ampere reference |
+
+Both rigs run an identical, aligned package set (linux-lts, nvidia-open-dkms,
+nvidia-utils, cuda 13.3.1); the full matrix and the lock procedure live in
+[environment.md](environment.md).
 
 Every number in any report names its rig and its locked clock. The incumbent
 to characterize and beat is the explicit Turing branch already present in the
