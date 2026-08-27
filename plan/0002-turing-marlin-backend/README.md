@@ -46,6 +46,15 @@ verify that description against the pin before building on it.
 
 ## Deliverables
 
+Status: the contract, the characterization, the model, the reference
+backend, and the search are complete and documented here
+([marlin-contract.md](marlin-contract.md),
+[tu102-characterization.md](tu102-characterization.md),
+[performance-model.md](performance-model.md),
+[reference-backend.md](reference-backend.md),
+[kernel-search.md](kernel-search.md)); integration, the adversarial
+runtime campaign, the MoE path, and the final report are in flight.
+
 1. The Marlin compatibility specification: the full contract (inputs, weights,
    quantization semantics, layouts, dispatch, runtime requirements) for dense
    and MoE paths at the pin.
