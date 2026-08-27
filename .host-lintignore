@@ -1,0 +1,20 @@
+# Paths excluded from `host-lint --all`: not this host's authored live content,
+# so out of scope for the naming audit here.
+
+# The Where room, and the gate tools: bare stores + worktrees under software/
+# (see .host-software). Materialized locally from the recipe and gitignored;
+# each is audited in its own repository, and --all walks the filesystem, so the
+# room is named here.
+software/
+
+# The referenced methodology template: audited upstream, not host content.
+host-template/
+
+# Generated mdBook output.
+book/
+mdBook/
+
+# The append-only record: MEMORY.md is frozen history, never reworded. It is
+# excluded by construction whether or not it is listed; the entry makes the
+# exclusion visible.
+MEMORY.md

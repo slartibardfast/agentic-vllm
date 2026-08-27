@@ -1,0 +1,101 @@
+# The lifecycle manifest (plan/0025) — the single tool-readable journal of the
+# agentic-host lifecycle. One [phase "<name>"] stanza per phase, in `order`. This
+# file is the source of truth that the three prose copies (CLAUDE.md / STRUCTURE.md
+# / UPGRADING.md) now point at instead of re-typing: the phase order, modality,
+# driving command, skill, and the evidence a `done` receipt must carry all live here.
+#
+# `host-lifecycle` reads it (at the project's adopted `.host` revision) for `--next`,
+# the `book` lifecycle order, and the `software --check` receipt gate; an agent reads
+# it to see the whole lifecycle at a glance (`host-lifecycle manifest <path>`).
+#
+# Modality is first-class (Decision A, call/0017): the spine rule is "every phase
+# emits a receipt," not "every phase runs." A `conditional-on-<X>` phase is
+# tool-computed `n-a` where the project lacks X; a `recurring-per-component` phase is
+# receipted once per Where-room component. `skippable = false` marks a protected core
+# that refuses a `skip`/`n-a` receipt outright (R2).
+#
+# `recheck =` is the closed re-derivation `software --check` runs to re-verify a
+# `done` receipt — never the receipt's own assertion (R1). It MUST be cheap and MUST
+# NOT itself re-enter `software --check` (the gate runs it without the nesting guard).
+
+[phase "classify"]
+	order    = 1
+	modality = unconditional
+	command  = host-lifecycle classify
+	skill    = classify
+	evidence = migration case (a/b/c) + draft rename map
+	recheck  = host-lifecycle classify .
+
+[phase "adopt"]
+	order    = 2
+	modality = unconditional
+	command  = host-lifecycle scaffold
+	skill    = adopt
+	evidence = .host stamp (template + revision adopted)
+	recheck  = test -f .host
+
+[phase "embed"]
+	order    = 3
+	modality = conditional-on-Where, recurring-per-component
+	command  = host-lifecycle software
+	skill    = embed
+	evidence = .host-software pin per component
+	requires = adopt
+	recheck  = test -f .host-software
+
+[phase "remap"]
+	order    = 4
+	modality = unconditional
+	command  = host-lifecycle remap
+	skill    = remap
+	evidence = .host-remap dictionary applied; naming audit clean
+	recheck  = host-lifecycle remap --check .
+
+# The `refs --gate` clause judges the RECORD, not the working tree, so an uncommitted
+# note cannot re-open this receipt or stop a release over a file the release does not
+# ship. It reports and fails only on a reference naming a record that does not exist,
+# or a listed document it could not read. A bare issue number stays advisory there and
+# never reaches this chain: only the author knows which tracker a bare number meant, so
+# a gate that blocked on it would be a wall on the day it landed. Do not read that
+# against the `prose` clause, which DOES block on its advisory tier: a prose trope is
+# the author's own text and is always rewordable. The two are not inconsistent, and
+# tolerating a prose warn here would disarm the gate its own ledger entry installs
+# (agentic-host call/0048).
+[phase "verify"]
+	order     = 5
+	modality  = unconditional
+	command   = host-lifecycle software --check
+	skill     = verify
+	evidence  = gate sweep green (validate, software --check, book --check, hook tell test)
+	skippable = false
+	recheck   = host-lifecycle validate plan/ call/ && host-lifecycle prose . && host-lifecycle reconcile . && host-lifecycle refs --gate .
+
+[phase "publish"]
+	order    = 6
+	modality = unconditional
+	command  = host-lifecycle book
+	skill    = publish
+	evidence = generated mdBook site; doc-site CI lane wired
+	recheck  = host-lifecycle book --print-mount .
+
+[phase "upgrade"]
+	order    = 7
+	modality = unconditional
+	command  = host-lifecycle upgrade
+	skill    = upgrade
+	evidence = .host applied-set (each template revision recorded)
+	recheck  = test -f .host
+
+[phase "release"]
+	order    = 8
+	modality = conditional-on-Where, recurring-per-component
+	command  = host-lifecycle release
+	skill    = release
+	evidence = annotated vX.Y.Z tag + re-derived artifact hash + re-pinned .host-software
+	requires = verify
+	recheck  = test -f .host-software
+
+# The lifecycle manifest is phases only (plan/0039): a project's own facts (its
+# `components` and `verifiers`) live in its `.host-software`, never the shared spine,
+# so no adopter inherits another project's facts. `manifest --check` rejects any stanza
+# that is not a `[phase "..."]`.
