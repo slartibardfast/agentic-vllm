@@ -87,3 +87,9 @@
     evidence = validate, prose, reconcile, and refs --gate all green at re-recording time
     tool = host-lifecycle@0.50.0
     recorded = 2026-08-27
+
+[receipt "materialize" "vllm"]
+    disposition = done
+    evidence = 1 item(s) realized for vllm at pin 79378fe6e876 (reference)
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-27
