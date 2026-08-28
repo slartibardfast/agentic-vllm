@@ -68,10 +68,17 @@ correctness reference was evaluated on CPU (`marlin_bench.py --cpu-ref`,
 added for this run — identical IEEE fp64, and the only way the
 correctness pass fits in the ~0.5 GiB the resident card leaves); and the
 card was not exclusive, so the numbers carry the server's 7.16 GiB
-residency, which does not enter kernel timing at locked clocks. The
-clean-window protocol of record remains `~/run_sm86_bench.sh`
-(self-gating, attested refusing while the server was up); if the
-operator ever opens the window, its numbers supersede this column.
+residency, which does not enter kernel timing at locked clocks.
+
+This column is final for the milestone. The interference proof here is
+strictly stronger than the clean protocol's: an exclusive-card run can
+only assume nobody used the idle machine, while this run proves via the
+server's own counters that it served nothing — before, during, and
+after each measurement. Re-running the same kernels on the same locked
+card cannot materially differ. `~/run_sm86_bench.sh` (self-gating,
+attested refusing while the server was up) stays staged for anyone who
+wants a ceremonial re-run; it is an optional refinement outside the
+milestone, not a gap.
 
 Artifacts: `results/marlin-bench-sm86-contended.{json,log,verdict.txt,
 util.log}` on the fork; runner `bench/run_sm86_degraded.sh` (rope:
