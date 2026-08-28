@@ -11,3 +11,10 @@
     evidence = suite in turing_lab on branch sm75-marlin; full protocol plus shared lanes in tu102-characterization.md; smoke verify green
     tool = host-lifecycle@0.50.0
     recorded = 2026-08-27
+
+[receipt "plan/0002#dense-integration"]
+    disposition = done
+    verify = attested operator
+    evidence = backend registered in the fork, four selection tests plus two e2e lifecycle tests green on TU102
+    tool = host-lifecycle@0.50.0
+    recorded = 2026-08-28
