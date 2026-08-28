@@ -71,3 +71,21 @@ The occupancy constraint from the performance model (two resident blocks
 per SM) rules out nothing in this generation: every candidate's shared
 footprint is at or under 36.9 KB, and the two-block rule shows up instead
 as the flat factor-2 warp-scaling curve measured in the characterization.
+
+## Measured N4096/K4096 sweep (locked 1455 MHz, first generations)
+
+| M | incumbent sm_75 | opt1 (BN64/W4 fp16-staged) | pipe (BK32 double-buffer) |
+|---|---|---|---|
+| 1 | 0.60 | 0.16 | 0.24 |
+| 8 | 4.86 | 1.26 | 1.85 |
+| 32 | 13.98 | 4.79 | 6.72 |
+| 128 | 35.13 | 17.48 | 11.86 |
+| 512 | 51.38 | 23.49 | 13.12 |
+
+(TFLOP/s, median of 20.) The incumbent leads everywhere; the pipelined
+variant wins the small-M regimes over opt1 and opt1 wins large M. The gap
+to close is the incumbent's deep software pipeline: register-resident
+dequantized fragments (requiring the repack interleave study), split-K for
+the small-M regime, and multi-stage overlap. Both kernels are
+oracle-correct; the numbers are first-generation measurements, not
+tuned results.
