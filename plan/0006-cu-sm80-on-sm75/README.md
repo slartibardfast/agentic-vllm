@@ -19,6 +19,42 @@ divergence.
 | `cuda::barrier` / `cuda::memcpy_async` libcu++ abstractions | bridge-backed equivalents |
 | TMA / WGMMA / clusters (sm_90, FA3-only) | out of scope by definition |
 
+## The bridge set (what cu_smXX_on_sm75 should exist)
+
+Defined at the PTX/ISA primitive level, per source architecture —
+not per consumer:
+
+| Bridge | Unlocks | New primitives to emulate | Effort |
+|---|---|---|---|
+| cu_sm80_on_sm75 | flash-attn 2, FlashInfer sm_80 paths, Marlin family, CUTLASS sm_80 kernels, most Triton output | cp.async + commit/wait groups, m16n8k16 FP16->FP32, m16n8k32 INT8 reshape, bf16 arithmetic, mbarrier | core |
+| cu_sm89_on_sm75 | FP8-targeted kernels (Ada generation) | FP8 MMA as cvt->FP16 MMA; e4m3/e5m2 cvt | thin, delta over sm_80 |
+| cu_sm90_on_sm75 | FA3-class kernels, DeepGEMM-class, Machete, FlashInfer Hopper paths | WGMMA->mma.sync loops with ldmatrix (native), TMA->cp.async/ld+st, clusters->flat, mbarrier phases | large |
+| cu_sm100/120_on_sm75 | Blackwell-era NVFP4/MXFP4/FP6-FP8 block-scaled checkpoints | tcgen05->mma.sync (functional only); the real value is format decode: FP4 LUT + block scales | medium |
+
+Priority follows the table: sm_80 is the core, sm_89 is a thin FP8
+delta, sm_90 buys the Hopper kernel surface, sm_100/120 buys checkpoint
+format decode where the machinery (nibble LUTs, block scales) is
+already ours.
+
+## Non-overfit design rules
+
+1. The bridge is specified against the PTX ISA documentation's
+   semantics — conformance means implements-the-spec, so any consumer
+   gets exactly what the spec guarantees.
+2. Deliverables are consumer-agnostic: a device header library, a
+   PTX->PTX rewrite pass for the instruction families (so upstream
+   artifacts can be post-processed without source patches at all), and
+   a per-primitive conformance suite.
+3. vLLM is consumer #1 behind a thin adapter (backend registration and
+   dispatch only). If vLLM's internals change, the bridge and the
+   conformance suite are untouched.
+4. The generality proof is multi-consumer: flash-attn, FlashInfer, a
+   Triton-emitted kernel, and a llama.cpp-style dequant-GEMM must all
+   run on the same bridge before it is called compatible.
+5. Honest limits stay attached per bridge: no register-file bypass for
+   cp.async, no smem-direct WGMMA operands, no tensor memory, and
+   emulation runs at FP16 tensor rate, never at native FP8/FP4 rates.
+
 ## Architecture
 
 1. **The bridge header** (`turing_lab/bridge/sm80_on_sm75.cuh`):
