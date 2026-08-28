@@ -48,6 +48,17 @@ kernel-search.md and MEMORY.md.
 
 ## Rope sm_86 column
 
-Pending the operator's llama-server window; the rig is aligned
-(linux-lts 6.18.47, driver 610.57.04, CUDA 13.3.1, clocks locked at
-1665 MHz) and the benchmark script is ready.
+The run is staged and one operator action away. On rope
+(192.168.178.60): `~/marlin_bench.py` is byte-identical to the local
+`bench/marlin_bench.py`, `~/vllm-ref` carries vllm 0.28.0 +
+torch 2.13.0+cu130, and clocks are locked at 1665 MHz (verified
+2026-08-28). `~/run_sm86_bench.sh` (versioned as
+`bench/run_sm86_bench.sh`) self-gates: it refuses while llama-server
+holds the GPU or the clock lock is inactive, and never stops or starts
+llama-server itself — the gate was exercised live and correctly refused
+while llama-server (pids 544, 545) was up.
+
+Procedure for the window: stop llama-server, run
+`~/run_sm86_bench.sh`, fetch `~/marlin-bench-sm86.json`, restart
+llama-server. The column in the table above is filled from the
+`4096x4096` rows of that JSON.
