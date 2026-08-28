@@ -64,14 +64,25 @@ data, not errors.
   not the selection harness (constant per-launch overhead cancels in
   selection but not in absolute latency claims).
 
-## Acceptance
+## Acceptance — MET (2026-08-28, run dispatch-table-20260828T121538Z)
 
-1. Ladder full-fidelity run with the new space; emitted
-   `dispatch-table-*.json` beats the first-gen baseline beyond the gate
-   margin in >= 1 regime, no regime regressed (gate transcripts
-   committed).
-2. Reference pipe NaN root-caused and fixed, or its defect boundary
-   precisely documented.
-3. kshard2 re-judged on fp32 partials with transport evidence.
-4. vLLM tests green (selection, e2e, dispatch-table).
-5. Artifacts committed; fork tip pinned here as plan/0003 was.
+1. **The emitted table beats the first-generation baseline beyond the
+   gate margin in regime M in [1, 8]: `regdeq_64_128_64_w4x2` with
+   split-K nz=2** — 0.1793 vs 0.2234 ms at M=1 and 0.1834 vs 0.2427 ms
+   at M=8 (sigma 0.0077), no other regime regressed (baselines retained
+   by their own gate transcripts, committed). Note: regime-relative
+   timings are harness-internal (constant per-launch overhead included
+   in both sides); absolute small-M latency still comes from
+   marlin_bench-style runs.
+2. Reference pipe NaN: retracted as a test artifact before this
+   milestone opened (plan/0003 record corrected).
+3. kshard2 re-judged on fp32 partials over NVLink: oracle-clean,
+   1.68x at M=64 and 1.36x at M=512 (kshard2-fp32-results.json). The
+   earlier "precision failure" was in fact a test harness bug (full-A
+   passed against half-Q; the driver derives K from A's width).
+4. vLLM tests green: 10/10 (4 selection, 2 e2e, 4 dispatch-table).
+5. Fork tip pinned in .host-software as plan/0003 was.
+
+Ladder caveat recorded: one candidate (regdeq2_64_128_64_w4x1 nz=2)
+scored an oracle zero during rung2 of the run, but passes 3x in
+isolation - a transient, treated fail-safe (culled, not admitted).
