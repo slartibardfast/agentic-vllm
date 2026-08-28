@@ -55,6 +55,32 @@ already ours.
    cp.async, no smem-direct WGMMA operands, no tensor memory, and
    emulation runs at FP16 tensor rate, never at native FP8/FP4 rates.
 
+## Red-line performance contract (raw PTX headers, by construction)
+
+The bridge is hand-written inline-asm PTX in .cuh headers — instruction
+selection, cache hints, STS ordering and pipeline schedules are fixed by
+the header, not left to the compiler. C++ wrappers exist only at the API
+surface. Per-primitive red lines are enforced by conformance tests that
+FAIL THE BUILD on regression:
+
+1. **cp.async semantics are 1:1 by construction.** On sm_75 the STS
+   cannot issue before its LDG retires - the hardware scoreboard is
+   wait_group for per-thread ordering, so commit_group/wait_group
+   compile to scheduling fences at zero runtime cost. The one
+   irreducible delta is registers held in flight; the occupancy gate
+   prices it (CUTLASS 2.x Turing GEMMs demonstrated near-peak DRAM
+   utilization with exactly this pattern - the line is reachable, not
+   aspirational).
+2. **Staging bandwidth floor**: the staged-copy pattern sustains >= 90%
+   of the bench_memory-measured DRAM peak at reference tile sizes.
+3. **MMA adapter overhead**: <= +1 ALU op per fragment over the native
+   sequence; issue slots <= 2x the k16 native (the 2x k8 split is by
+   definition), verified against bench_mma.
+4. **Cache discipline**: streaming loads carry .cs/.nc hints so staging
+   never evicts hot L2; verified by SASS inspection.
+5. **Register budget**: per-config caps from the occupancy rule;
+   violations fail the SASS gate.
+
 ## Architecture
 
 1. **The bridge header** (`turing_lab/bridge/sm80_on_sm75.cuh`):
