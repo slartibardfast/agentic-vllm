@@ -101,14 +101,36 @@ ladder on sm_75:
    block scales as power-of-two FP16 multiplies (32-element blocks).
 9. **NVFP4 adapter** — E2M1 nibble LUT + E4M3 block scales
    (16-element blocks); the scale conversion reuses the FP8 rebias.
-10. **Both-card target run** — the operator's Qwen3-class ~27B
+10. **BF16 checkpoint adapter** — the most commonly hit gate of all:
+    modern releases ship bf16 and sm_75 has no bf16 tensor support
+    (upstream answer: pass dtype=float16). Recast bf16->fp16 at load
+    (8 mantissa bits fit fp16's 10) with an overflow range check:
+    >65504 outliers reported, never silently truncated.
+11. **Attention/engine strategy** — the largest blocked surface is not
+    a format: upstream vLLM's V1 engine requires FlashAttention or
+    FlashInfer (sm_80+) and the V0/xformers path Turing relied on has
+    been removed, so current upstream has no working sm_75 engine at
+    all. This fork retains the Turing-capable engine (CUDA-graph
+    validated); the strategy row is keeping that engine healthy against
+    upstream drift, plus a Triton-attention option (Triton runs on
+    sm_75) as the portable fallback.
+12. **MLA models (DeepSeek-class)** — FlashMLA is sm_90/Blackwell-only;
+    the emulated path is Triton-MLA, unmeasured on Turing. Registry row
+    + measurement; expected slow, but the interop contract is
+    execution with attested numerics, and slow-but-correct is how every
+    backport starts.
+13. **Both-card target run** — the operator's Qwen3-class ~27B
     checkpoint across both GPUs, tokens/s committed with the serving
     configuration (TP over NVLink or the measured shard strategies).
 
-The operator NAKed deferral: every format vLLM can load is in this
-milestone, sequenced above. A format is done when its adapter, kernel
-rows, oracle transcript, and selection entry are committed and the
-coverage table below has no uncovered row.
+The operator NAKed deferral: the lacuna is not only quant formats.
+Every surface vLLM conventionally gates to sm_80+ — quant formats,
+checkpoint dtypes, attention backends, the engine itself — is in this
+milestone, sequenced above. A surface is done when its adapter or
+backend, kernel rows, oracle transcript, and selection entry are
+committed and the coverage table below has no uncovered row. The
+engine row (11) is the load-bearing one: without a Turing engine,
+every other row is unreachable on current upstream.
 
 ## Hardware-fact sheet (why Turing is good at this)
 
