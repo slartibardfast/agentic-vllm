@@ -241,3 +241,57 @@ exactly this substitution at the header level.
 
 - m8n8k32 .s4 canonical register arity and `.satfinite` requirement
   (empirical open question; does not gate any committed plan).
+
+## Target versions (best available, verified 2026-08-28)
+
+| component | version | role |
+|---|---|---|
+| flash-attn | v2.8.3 stable line (FA4 v4.0.0-beta28 is Blackwell tcgen05 — out of bridge scope) | quilt target #1 |
+| FlashInfer | v0.6.18 (2026-08-10; our venv pins 0.6.17 — bump candidate, both vendor their csrc locally) | quilt target #2 |
+| CUTLASS | 4.8.0 — 2.x Turing API headers mma_sm75.h / memory_sm75.h, retention to be verified in the first implementation stage | prior-art reference + header source |
+| CCCL | CUDA 13.3 toolkit does NOT ship `cuda/__barrier` headers at the expected path — the bridge vendors the pre-sm80 barrier emulation per the CCCL SM_70 recipe | mbarrier emulation |
+| torch | 2.13.0+cu130 | extension ABI |
+| vLLM | fork sm75-marlin @ pinned tip | integration host |
+
+## References
+
+- PTX ISA 9.3, NVIDIA:
+  https://docs.nvidia.com/cuda/parallel-thread-execution/
+  (mma shapes 9.7.15.5; ldmatrix/movmatrix 9.7.15.5.15/17; cp.async
+  9.7.9.26; mbarrier 9.7.14.16; cvt 9.7.9.22; TMA 9.7.9.26.4-5;
+  tcgen05 9.7.17)
+- flash-attn: https://github.com/Dao-AILab/flash-attention
+  (kernel_traits.h sub-80 path; setup.py arch list; host gate
+  csrc/flash_attn/flash_api.cpp; releases: fa4-v4.0.0.beta28, 2.8.x)
+- FA2 Turing port (prior art): https://github.com/ssiu/flash-attention-turing
+- FlashInfer: https://github.com/flashinfer-ai/flashinfer
+  (releases v0.6.18-20260819; sm_75 breakage: issue #3620, fix PR #3621;
+  paper arXiv:2501.01005)
+- vLLM engine gating:
+  https://github.com/vllm-project/vllm/blob/main/vllm/v1/attention/backends/
+  (flash_attn.py >= (8,0); flashinfer.py floor comment; triton_attn.py
+  returns True); V0 removal RFC #18571
+- CUTLASS: https://github.com/NVIDIA/cutlass (4.8.0; arch/mma_sm75.h,
+  arch/memory_sm75.h, gemm/threadblock/mma_pipelined.h,
+  arch/memory_sm80.h CUDA_CP_ASYNC_ACTIVATED guard; bfloat16.h)
+- CCCL pre-sm80 barrier: https://github.com/NVIDIA/cccl
+  (libcudacxx cuda/__barrier/barrier_block_scope.h SM_70 dispatch;
+  issue #419)
+- FP8-Marlin recipe:
+  https://github.com/vllm-project/vllm/blob/v0.8.5/csrc/quantization/fp8/fp8_marlin.cu
+  (FasterTransformer interleaved converters); vLLM FP8 docs
+  https://docs.vllm.ai/en/stable/features/quantization/llm_compressor/fp8/
+- MMA microbenchmarking (k-order): arXiv:2208.11174
+- FP8 format: arXiv:2209.05433; FP8-Marlin kernel paper: arXiv:2408.11743
+- INT8 Turing prior art: https://github.com/jundaf2/CUDA-INT8-GEMM
+  (4x m8n8k16 m16n16k16); CUTLASS int8 layouts: discussion #911, issue #1030
+- Translation-layer prior art: ZLUDA https://github.com/vosen/ZLUDA ;
+  GPU Ocelot https://github.com/gpuocelot ; HetGPU arXiv:2506.15993 ;
+  CASS arXiv:2505.16968 ; NVLift/Sass-LLifter ; BarraCUDA ; CuPBoP
+  (ACM 10.1145/3624062.3624185)
+- xformers FMHA (CUTLASS 2.x Turing attention):
+  https://github.com/facebookresearch/xformers
+- llama.cpp CUDA on Turing: ggml-org/llama.cpp discussion #15013 ;
+  https://developer.nvidia.com/blog/accelerating-llms-with-llama-cpp-on-nvidia-rtx-systems/
+- NVIDIA EULA translation-layer note:
+  https://www.reddit.com/r/programming/comments/1b7go8t/nvidia_bans_using_translation_layers_for_cuda/
