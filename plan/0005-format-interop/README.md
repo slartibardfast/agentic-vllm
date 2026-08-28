@@ -82,13 +82,33 @@ ladder on sm_75:
    the kernel family; ladder-tuned like every other strategy; acceptance:
    beats recast's memory footprint at no worse than a measured, gated
    compute penalty, or is documented as losing.
-4. **Format axis in selection** — DispatchTable + can_implement gate on
+4. **AutoRound adapter** — W4A16 asymmetric+ZP through the staged
+   strategy (already zero-point-capable); W2A16 as a 2-bit strategy row
+   (16 weights per u32); W3A16 as a 3-bit packing row; ladder-gated
+   like all rows.
+5. **Format axis in selection** — DispatchTable + can_implement gate on
    format coverage; vLLM tests green; incoming-format checklist doc
-   ("new model arrives -> which adapter, which strategy, expected speed").
-5. Later, recorded but deliberately not opened yet: FP8 activations
-   with per-token scales, emulated as FP16 activations; FP8 KV either
-   recast to fp16 KV at 2x memory or quantized to int8 KV; MXFP4 and
-   NVFP4 adapters.
+   ("new model arrives -> which adapter, which strategy, expected
+   speed").
+6. **FP8 activations (W8A8 emulated)** — per-token scales; activations
+   rounded onto the E4M3 grid but stored and computed in FP16 (faithful
+   emulation, no hardware FP8 needed); runtime quantization hook at the
+   layer boundary.
+7. **FP8 KV** — recast to fp16 KV at 2x memory (faithful, simple) or
+   int8 KV (measured against fp16-KV quality); the serving config
+   records which the checkpoint requires.
+8. **MXFP4 adapter** — E2M1 values via a 16-entry nibble LUT, E8M0
+   block scales as power-of-two FP16 multiplies (32-element blocks).
+9. **NVFP4 adapter** — E2M1 nibble LUT + E4M3 block scales
+   (16-element blocks); the scale conversion reuses the FP8 rebias.
+10. **Both-card target run** — the operator's Qwen3-class ~27B
+    checkpoint across both GPUs, tokens/s committed with the serving
+    configuration (TP over NVLink or the measured shard strategies).
+
+The operator NAKed deferral: every format vLLM can load is in this
+milestone, sequenced above. A format is done when its adapter, kernel
+rows, oracle transcript, and selection entry are committed and the
+coverage table below has no uncovered row.
 
 ## Hardware-fact sheet (why Turing is good at this)
 
