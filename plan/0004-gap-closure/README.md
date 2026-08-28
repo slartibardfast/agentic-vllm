@@ -8,19 +8,19 @@ clock-attested). Today the gates correctly retain the first-generation
 baselines everywhere; the D8 gap decomposition names exactly what is
 missing.
 
-## Goal 1 — repack interleave for regdequant
+## Goal 1 — swizzled staging for regdequant (IMPLEMENTED as `regdeq2`)
 
-The incumbent's weight-repack ordering lets the skip-flop dequant run
-without per-fragment byte_perm shuffles; our `regdequant` port does the
-shuffles and loses because of it (ladder best 17.94 TF/s vs baseline
-17.9-21 at M=512, and D8 identified the interleave as the enabler).
+The incumbent's weight ordering lets the skip-flop dequant run without
+per-fragment byte_perm shuffles. Rather than a host-side repack, the
+permutation is hoisted into the kernel's staging loop: four lane-swizzled
+words are precomputed per packed word into shared memory
+(`sQW[BN][BK/8][4]`), so the mma stream is lop3 + hsub2 only. Cost: 2x
+the scale smem of regdequant (25.6 KiB at 64x128x64, still >=2 blocks).
 
-- Add a lab repack (`repack_interleave`) producing the incumbent-style
-  interleave; the regdequant kernel indexes it directly.
-- Oracle against the float64 reference as always (repack is
-  numerics-neutral; the kernel change is what gets gated).
-- Accept when regdequant-with-interleave beats the staged baseline
-  beyond the gate margin in at least one regime.
+- Implemented as strategy `regdeq2` in turing_search.cu; 8 tile rows;
+  oracle-clean across the table.
+- Accept when regdeq2 beats the staged baseline beyond the gate margin
+  in at least one regime (final ladder run decides).
 
 ## Goal 2 — deep software pipeline
 
