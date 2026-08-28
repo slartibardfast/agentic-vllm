@@ -8,10 +8,9 @@ Runtime validation of the pipelined packed-staging kernel
 - CUDA graph capture: the kernel launches with no host-side allocation in
   the launch path (preallocated output), so capture succeeds on the first
   attempt without warmup reallocation.
-- Graph replay after mutating the activations reproduces the updated
-  reference within fp16 tolerance (max abs err 0.16 on a reference scale
-  of ~40 after a 1 percent input perturbation), proving the graph
-  recomputes rather than replaying stale results.
+- The graph replay after an activation mutation reproduces the updated
+  reference within fp16 tolerance, so the graph recomputes rather than
+  replaying stale results.
 - No host synchronization in the launch path; stable shapes; stable
   workspace.
 
