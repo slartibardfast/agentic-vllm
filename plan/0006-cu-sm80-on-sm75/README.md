@@ -121,9 +121,37 @@ FAIL THE BUILD on regression:
   occupancy gates, float64 oracles, the ladder, and CUDA-graph
   validation.
 
+## Auto-research over the bridge (nothing left on the table)
+
+The .cuh headers are generated artifacts, not hand-written endpoints.
+Every primitive is a schedule with a searchable design space, and the
+plan/0003 machinery (TPE ladder, oracle, winner gates) drives it:
+
+- **Space per primitive**: the staged-copy bridge searches stage count
+  (2-8), vector width, XOR-swizzle pattern, LDG/STS/MMA issue
+  interleavings, cache hints (.cs/.nc/plain), and unroll factors; the
+  MMA adapters search pair-split order, operand forwarding, and dual
+  issue interleaving; converters search LUT sizing vs ALU sequences.
+- **Hard constraints, non-negotiable**: bit-exactness (schedules are
+  semantically identical by definition - any oracle diff is a defect,
+  not a tradeoff), SASS/occupancy legality, and the red-line floors
+  (bandwidth, issue, register caps). These gate, never trade.
+- **Exhaustive where enumerable, TPE where not**: schedule permutations
+  within a stage budget are enumerated outright; only beyond the
+  enumeration budget does the TPE sampler take over.
+- **The coverage ledger**: every legal point in the space is either
+  measured (timing transcript committed) or model-pruned (the pruning
+  reason committed). Nothing-on-the-table is therefore auditable: no
+  silently skipped candidates, ever.
+- **Provenance in the shipped header**: the winning schedule is frozen
+  into the .cuh with the search transcript hash, so every primitive
+  carries the evidence it was chosen by measurement, and a future
+  generation can re-run the search against new upstream releases.
+
 ## Stages
 
-1. Bridge header + per-primitive oracles + microbenches.
+1. Bridge header generator (schedule-space definition) + per-primitive
+   oracles + red-line conformance + microbenches.
 2. flash-attn quilt: sm_75 build of FA2's sm_80 kernel path; attention
    oracle vs the fp64 softmax reference; benches vs the current engine
    attention.
