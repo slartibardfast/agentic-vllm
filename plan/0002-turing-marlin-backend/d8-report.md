@@ -3,8 +3,8 @@
 Turing (sm_75) Marlin interoperability program, milestone plan/0002.
 All numbers measured on this host at locked 1455 MHz (Quadro RTX 6000,
 driver 610.57.04, CUDA 13.3.1), median of 20 after warmup. The rope
-sm_86 column is a placeholder pending the operator's llama-server
-window.
+sm_86 column awaits the operator's llama-server window; the run is
+staged and self-gating (see the closing section).
 
 ## Measured results (N = K = 4096, W4A16 GPTQ symmetric)
 
