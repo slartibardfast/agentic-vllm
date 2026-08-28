@@ -40,6 +40,35 @@ dispatch table gains a **format axis**: selection gates on "we have an
 execution strategy for this checkpoint", replacing the hardware
 capability gate.
 
+## Operator target
+
+A Qwen3-class ~27B model on both cards (2x RTX 6000, 48 GB aggregate).
+Feasibility per format: FP8 ~27 GB weights -> ~14 GB/card with generous
+KV; W4A16 ~14 GB -> single-card possible, both cards for throughput;
+W2A16 ~7 GB -> single-card. Both-card serving runs over the NVLink
+bridge (vLLM tensor parallel with peer access enabled, or the measured
+plan/0004 shard strategies); if the target checkpoint is the MoE
+variant, the MoE grouped forward is already oracle-validated
+(plan/0002). Acceptance for the milestone: this checkpoint class loads,
+generates on both cards, and tokens/s are measured and committed.
+
+## AutoRound formats (Intel) — added to the lacuna
+
+Intel's AutoRound emits W2A16/W3A16/W4A16 checkpoints (asymmetric
+signed ints with group scales and zero points, in GPTQ/AWQ-compatible
+or compressed-tensors layouts). These fill the low end of the format
+ladder on sm_75:
+
+- **W4A16 asymmetric + ZP**: our `staged` strategy is already
+  zero-point-capable (the reference contract); the adapter maps
+  AutoRound's signed int4 + zp into the staged layout. This is the
+  shortest path to serving AutoRound W4 on Turing.
+- **W2A16**: 16 weights per u32 — a wider-grain sibling of the nibble
+  machinery, cheapest dequant of all (2-bit extract + group scale);
+  implement as a strategy row through the standard gates. Precision is
+  AutoRound's problem; ours is exact execution of the stored values at
+  best speed.
+
 ## Stages
 
 1. **Checkpoint adapters** — parse FP8 layouts into a (weights, scales)
