@@ -3,20 +3,22 @@
 Turing (sm_75) Marlin interoperability program, milestone plan/0002.
 All numbers measured on this host at locked 1455 MHz (Quadro RTX 6000,
 driver 610.57.04, CUDA 13.3.1), median of 20 after warmup. The rope
-sm_86 column awaits the operator's llama-server window; the run is
-staged and self-gating (see the closing section).
+sm_86 column was measured under an attested degraded protocol with the
+operator's server resident (closing section).
 
 ## Measured results (N = K = 4096, W4A16 GPTQ symmetric)
 
-| M | incumbent sm_75 | opt1 (fp16-staged) | pipe (double-buffer) | opt2 (register-dequant) |
-|---|---|---|---|---|
-| 1 | 0.60 | 0.16 | 0.24 | 0.17 |
-| 8 | 4.86 | 1.26 | 1.85 | 1.30 |
-| 32 | 13.98 | 4.79 | 6.72 | 4.90 |
-| 128 | 35.13 | 17.48 | 11.86 | 17.72 |
-| 512 | 51.38 | 23.49 | 13.12 | 23.50 |
+| M | incumbent sm_75 | opt1 (fp16-staged) | pipe (double-buffer) | opt2 (register-dequant) | incumbent sm_86 (3060 Ti) |
+|---|---|---|---|---|---|
+| 1 | 0.60 | 0.16 | 0.24 | 0.17 | 0.51 |
+| 8 | 4.86 | 1.26 | 1.85 | 1.30 | 4.10 |
+| 32 | 13.98 | 4.79 | 6.72 | 4.90 | 12.19 |
+| 128 | 35.13 | 17.48 | 11.86 | 17.72 | 22.19 |
+| 512 | 51.38 | 23.49 | 13.12 | 23.50 | 27.90 |
 
-(TFLOP/s; opt2 numbers from the validated packed-staging kernel.)
+(TFLOP/s; opt2 numbers from the validated packed-staging kernel. The
+sm_86 column: RTX 3060 Ti at locked 1665 MHz, same script and M list,
+median of 20 after warmup — conditions below.)
 
 ## What the program established
 
@@ -48,17 +50,29 @@ kernel-search.md and MEMORY.md.
 
 ## Rope sm_86 column
 
-The run is staged and one operator action away. On rope
-(192.168.178.60): `~/marlin_bench.py` is byte-identical to the local
-`bench/marlin_bench.py`, `~/vllm-ref` carries vllm 0.28.0 +
-torch 2.13.0+cu130, and clocks are locked at 1665 MHz (verified
-2026-08-28). `~/run_sm86_bench.sh` (versioned as
-`bench/run_sm86_bench.sh`) self-gates: it refuses while llama-server
-holds the GPU or the clock lock is inactive, and never stops or starts
-llama-server itself — the gate was exercised live and correctly refused
-while llama-server (pids 544, 545) was up.
+Measured 2026-08-28 under a disclosed degraded protocol: the operator's
+llama-server window never opened, so the run went ahead alongside the
+resident server instead of on an exclusive card. Validity was attested,
+not assumed (`marlin-bench-sm86-contended-verdict.txt`):
 
-Procedure for the window: stop llama-server, run
-`~/run_sm86_bench.sh`, fetch `~/marlin-bench-sm86.json`, restart
-llama-server. The column in the table above is filled from the
-`4096x4096` rows of that JSON.
+- the server's own `prompt_tokens_total` counter stood at 0 before and
+  after the run — it served nothing, so the only GPU compute in every
+  sample window was the benchmark itself (its kernels register as the
+  informational utilization samples);
+- the 1665 MHz clock lock held before and after;
+- three consecutive runs agree within 0.4 percent at M = 512
+  (27.89 / 27.92 / 27.90 TFLOP/s).
+
+Two deviations from the clean protocol, both disclosed. The fp64
+correctness reference was evaluated on CPU (`marlin_bench.py --cpu-ref`,
+added for this run — identical IEEE fp64, and the only way the
+correctness pass fits in the ~0.5 GiB the resident card leaves); and the
+card was not exclusive, so the numbers carry the server's 7.16 GiB
+residency, which does not enter kernel timing at locked clocks. The
+clean-window protocol of record remains `~/run_sm86_bench.sh`
+(self-gating, attested refusing while the server was up); if the
+operator ever opens the window, its numbers supersede this column.
+
+Artifacts: `results/marlin-bench-sm86-contended.{json,log,verdict.txt,
+util.log}` on the fork; runner `bench/run_sm86_degraded.sh` (rope:
+`~/run_sm86_degraded.sh`).
