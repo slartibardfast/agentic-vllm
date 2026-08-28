@@ -1,4 +1,4 @@
-# D8. Final benchmark report
+# D8: Final benchmark report
 
 Turing (sm_75) Marlin interoperability program, milestone plan/0002.
 All numbers measured on this host at locked 1455 MHz (Quadro RTX 6000,
@@ -35,7 +35,7 @@ window.
 
 ## Remaining gap to the incumbent
 
-The validated kernels reach 23–25 TFLOP/s at M = 512, about 46 percent
+The validated kernels reach 23 to 25 TFLOP/s at M = 512, about 46 percent
 of the incumbent's 51.38. The gap decomposes into:
 
 - the deep software pipeline (register-resident dequantized fragments,
