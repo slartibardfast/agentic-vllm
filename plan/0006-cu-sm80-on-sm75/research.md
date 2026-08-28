@@ -162,10 +162,82 @@ shape facts and a recorded W4A8-IMMA possibility for later.
    is the novel research deliverable and gets the red-line conformance
    treatment (bandwidth/occupancy floors) from the plan.
 
+## Track 3 — emulation techniques (implementation recipes)
+
+### cp.async staging
+
+NVIDIA's own degradation template is `cutlass/arch/memory_sm80.h`:
+`CUDA_CP_ASYNC_ACTIVATED` is set only for `__CUDA_ARCH__ >= 800`; below
+that the `cp_async`/`cp_async_zfill` intrinsics degrade to a typed
+load+store of `Array<uint8_t, N>` — the exact bridge pattern, from
+NVIDIA itself. The canonical pre-Ampere pipeline is
+`cutlass/gemm/threadblock/mma_pipelined.h` (Volta AND Turing): 2-stage
+shared ring, per-K-slice LDG.128 into threadblock fragment registers ->
+STS -> bare `__syncthreads()`, next global tile prefetched into the
+fragment registers while math runs. Register pressure caps practical
+depth at 2 stages on Turing (Ampere uses 3-4) — our ladder may search
+2-3 with the occupancy gate pruning beyond. Forum/field finding:
+`cuda::pipeline` gave no speedup on Turing, but warp specialization
+did.
+
+### mbarrier emulation
+
+CCCL's `cuda::barrier` already dispatches pre-sm80: warp-coalesced
+arrivals via `__activemask()` + `__match_any_sync`, one elected lane
+arrives, the token is `shfl_sync`ed back, and waiting is a shared-memory
+phase-poll spin with backoff. Simpler primitives: `__syncthreads_count`,
+named `bar.sync id, count`, `bar.arrive`/`bar.red` (what CUTLASS
+pre-Hopper pipelines use). Memory-ordering note: `fence.proxy.async` has
+no Turing equivalent and needs none — it exists only for async-proxy
+(cp.async) writes; on Turing all writes are generic-proxy, so
+`bar.sync`/`__threadfence_block()` suffices.
+
+### 2x m16n8k8 MMA: the accumulate-order question dissolves
+
+Ampere microbenchmarking (arXiv:2208.11174) shows m16n8k16 hardware
+processes K in 8-deep slices with sequential fp32 accumulation — so
+2x m16n8k8 reproduces the same k0-7 -> k8-15 order; it is within a
+ulp-tree reorder of any K-split. Fragment layouts are identical for the
+first k=8; the second loads B's alternate k-half into the same fragment
+registers and chains mma(D, A1, B1, D). flash-attn 1.x ran on Turing
+this way; prior art: xformers CUTLASS FMHA.
+
+### INT8
+
+Ampere m16n8k32's A-fragment (4 x b32) decomposes as two row-groups x
+two k-halves -> 4x Turing m8n8k16 with a near-identity register
+reshuffle; prior art jundaf2/CUDA-INT8-GEMM composes m16n16k16 from 4x
+m8n8k16 on Turing. Layout caveat: CUTLASS Turing int8 requires
+ColumnMajorInterleaved<32> + TensorOpMultiplicandCrosswise smem layouts.
+
+### bf16
+
+bf16->fp32 is one <<16 shift (free); fp32->bf16 RNE on sm_75 is a 4-6
+ALU-op bit trick (round bit, sticky, mantissa LSB, then += 1<<16) —
+sm_80+ gets a single cvt. Dominant practice: recast weights to fp16.
+
+### FP8 without FP8 units — the exact recipe for plan/0005
+
+vLLM's FP8-Marlin (`fp8_marlin.cu`, credited to FasterTransformer's
+interleaved converters) is a LUT-free bit trick: per 2 elements,
+~4 int ops + 1 packed HMUL2 (RIGHT_SHIFT = 1, MASK = 0x7F007F00, sign
+passthrough, bias fix by HMUL2 with 256). Alternatives: 256-entry fp16
+LUT (512 B, smem-friendly) or CUDA's software `__nv_cvt_fp8_to_halfraw`.
+This is the ready-made dequant recipe for plan/0005's emulated FP8
+strategy row.
+
+### PTX-translation prior art
+
+ZLUDA (PTX->LLVM->AMDGPU), CuPBoP, BarraCUDA (CUDA->RDNA3, no LLVM),
+CASS (ML NVIDIA->AMD transpilation), HetGPU, NVLift (SASS->LLVM),
+GpuOcelot/GPGPU-Sim. Lesson for a same-vendor same-family bridge:
+rewriting is far easier than the cross-vendor problem — identical warp
+size, memory model, and SASS family; only the capability-gated
+instructions need substitution, and NVIDIA's own header guards
+(`CUDA_CP_ASYNC_ACTIVATED`, `NV_DISPATCH_TARGET`) show NVIDIA performs
+exactly this substitution at the header level.
+
 ## Open items
 
 - m8n8k32 .s4 canonical register arity and `.satfinite` requirement
   (empirical open question; does not gate any committed plan).
-- Track 3 (emulation techniques: CUTLASS 2.x staging idioms, mbarrier
-  emulation patterns, FP8-conversion bit tricks) — appended when the
-  research completes.
