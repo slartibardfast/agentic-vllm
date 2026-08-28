@@ -18,6 +18,32 @@ reflects the hardware and not the toolchain. Aligned on 2026-08-27.
 
 ## Notes for anyone running measurements here
 
+- The Python lab environment lives at
+  `software/vllm/sm75-marlin/.venv` (Python 3.13, uv-managed). It was
+  rebuilt on 2026-08-28 after the previous session's venv was lost; a
+  from-scratch rebuild is:
+
+  ```sh
+  cd /opt/repo/agentic-vllm/software/vllm/sm75-marlin
+  uv venv .venv --python 3.13
+  uv pip install --python .venv/bin/python pytest tblib pytest-forked \
+      pytest-rerunfailures pytest-cov pytest-json-report \
+      torch==2.13.0+cu130 --index-url https://download.pytorch.org/whl/cu130
+  uv pip install --python .venv/bin/python -r requirements/cuda.txt
+  uv pip install --python .venv/bin/python 'cmake>=3.26.1' ninja \
+      'packaging>=24.2' 'setuptools>=77.0.3,<81.0.0' 'setuptools-scm>=8.0' \
+      'setuptools-rust>=1.9.0' wheel jinja2
+  CUDA_HOME=/opt/cuda VLLM_TARGET_DEVICE=cuda \
+      uv pip install --python .venv/bin/python -e . \
+      --no-deps --no-build-isolation
+  ```
+
+  The `--no-deps --no-build-isolation` form needs the build deps installed
+  into the venv first (cmake, ninja, packaging, setuptools, setuptools-scm,
+  setuptools-rust, wheel, jinja2, torch); without it uv builds an isolated
+  environment and re-downloads torch into it. Tests run from the fork
+  worktree root with `.venv/bin/pytest`.
+
 - Clock locks are driver state and they reset at every boot. Re-apply after
   each boot, on either rig, before trusting a number:
 

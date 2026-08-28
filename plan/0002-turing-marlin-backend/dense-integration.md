@@ -24,6 +24,10 @@ worktree root).
 
 ## Verification (all green on TU102 at the pin)
 
+Re-verified 2026-08-28 in the rebuilt lab venv against installed
+`0.28.1rc1.dev50+gcac8a75a7.d20260828.cu133` (see environment.md for the
+rebuild recipe): the six tests below pass, selection and e2e.
+
 Selection tests:
 
 ```
