@@ -1,4 +1,4 @@
-# D8: Final benchmark report
+# Final benchmark report
 
 Turing (sm_75) Marlin interoperability program, milestone plan/0002.
 All numbers measured on this host at locked 1455 MHz (Quadro RTX 6000,
