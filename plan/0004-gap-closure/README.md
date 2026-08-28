@@ -30,11 +30,11 @@ chunk k, beyond the current 2-stage pipe (which the reference kernel's
 NaN-at-K=4096 defect shows is not yet trustworthy either — root-cause
 that defect first, it is the same family).
 
-- Root-cause and fix the reference `turing_w4a16_pipe.cu` NaN at
-  K=4096 (documented in plan/0003; the search-space port is clean, so
-  the defect is in the reference's own guards).
-- Add a 3+ stage variant to the ladder via `propose.py`'s row interface
-  (strategy `pipe3`), gated identically.
+- RESOLVED before this milestone opened: the "reference pipe NaN at
+  K=4096" was a test artifact (1-row scale tensor with G=128); the
+  reference is clean with proper scales. Remaining here: add a 3+ stage
+  variant to the ladder via `propose.py`'s row interface (strategy
+  `pipe3`), gated identically.
 
 ## Goal 3 — fp32 split-K partials (unlocks kshard2)
 

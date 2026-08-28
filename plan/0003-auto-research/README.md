@@ -88,11 +88,11 @@ Multi-GPU strategies at N=K=4096 (staged config, oracle-checked):
   strategy token-paste.
 - Driver treated a zero-element ZP tensor as present (data_ptr of an
   empty tensor is not guaranteed null) — nondeterministic garbage.
-- **Reference `turing_w4a16_pipe.cu` produces NaN at K=4096** (K<=128
-  clean) — a latent defect in the previously "validated" kernel,
-  discovered while cross-checking this milestone's port. Unresolved;
-  the search-space `pipe` port does not share it (oracle-clean at
-  K=4096).
+- **"Reference `turing_w4a16_pipe.cu` NaNs at K=4096" — RETRACTED.**
+  The NaN was an artifact of the ad-hoc cross-check, which fed a
+  1-row scale tensor with G=128 (out-of-bounds group reads). With
+  proper (K/G, N) scales the reference is clean at K=4096
+  (err 0.0033, re-verified 2026-08-28). No kernel defect.
 
 ## Deferred (plan/0004 axes)
 
