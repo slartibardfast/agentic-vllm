@@ -281,6 +281,21 @@ This is the remaining core of the bridge-native attention forward.
 Staging, online softmax, masking, and epilogue logic are written;
 only the fragment index mapping blocks numerics.
 
+### Runtime status (2026-08-29 evening): open IMA
+
+The kernel now launches, stages (8 B u32 pieces after the v4
+misalignment fix), computes S, and faults with an illegal memory
+access. compute-sanitizer (memcheck) attributes it to the Q-staging
+sts_u32 at shared offset 432 by thread 96 of block 0 — inside the
+27648-B dynamic allocation per the launch — i.e. the flagged write is
+in bounds and the surrounding SASS (STS [R15] predicated, correct
+address arithmetic) looks right. FWD_BISECT hooks are in the header:
+the fault appears even at FWD_BISECT=1 (staging + S + mask only).
+Open hypotheses: sanitizer shared-window modeling vs dynamic smem on
+sm_75, or a fault in the PV/S code the bisect flags attribution
+misses. Next: minimal single-block repro + SASS-level analysis, or a
+register-level rewrite.
+
 ## Open items
 
 - m8n8k32 .s4 canonical register arity and `.satfinite` requirement
