@@ -259,6 +259,28 @@ instructions need substitution, and NVIDIA's own header guards
 (`CUDA_CP_ASYNC_ACTIVATED`, `NV_DISPATCH_TARGET`) show NVIDIA performs
 exactly this substitution at the header level.
 
+## Bridge-native attention kernel: fragment layout front (OPEN)
+
+`bridge/flash_fwd_sm75.cuh` v1 (staging + S-mma + online softmax
+skeleton) produces wrong numerics: the S/P values are misaligned. The
+empirical probe methodology (distinct marker values per fragment
+register half, read back the D regs) is built; findings so far:
+
+- The m16n8k8 D registers hold TWO ROWS per register (row pairs);
+  the exact column order within/between regs is not yet frozen.
+- The A/B fragment k-to-half mapping differs from the assumed
+  "low half = k 2t" convention (probe lane0 gave D=15.82 where the
+  assumed mapping predicts 39).
+- Known-correct reference: the flash-attn sub-80 CUTLASS atoms
+  (SM75_16x8x8_F32F16F16F32_TN) and the t1/t2 differential kernels —
+  the probe must be iterated until the bridge adapter reproduces the
+  naive kernel bit-exactly on marker inputs, THEN the mapping is
+  frozen into the header with the probe as its test.
+
+This is the remaining core of the bridge-native attention forward.
+Staging, online softmax, masking, and epilogue logic are written;
+only the fragment index mapping blocks numerics.
+
 ## Open items
 
 - m8n8k32 .s4 canonical register arity and `.satfinite` requirement
