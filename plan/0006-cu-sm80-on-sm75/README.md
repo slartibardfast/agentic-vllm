@@ -81,6 +81,24 @@ FAIL THE BUILD on regression:
 5. **Register budget**: per-config caps from the occupancy rule;
    violations fail the SASS gate.
 
+## Architecture (re-architected per operator NAK: the bridge is the execution path)
+
+**The bridge header IS the sm_75 kernel path.** FlashAttention and
+FlashInfer on Turing must execute on cu_sm80_on_sm75 primitives — the
+in-tree dormant sub-80 fallback of flash-attn is the thing this plan
+replaces, not the vehicle. Quilts route the libraries' Turing dispatch
+at bridge-native kernels; upstream code is consumed only for shapes,
+parameters, and the python API. FA2's own sub-80 path (SM75 CUTLASS
+atoms + sync-copy staging) is rejected as the execution vehicle:
+functional, but not the deliverable and not state of the art.
+
+Concretely: `turing_lab/bridge/flash_fwd_sm75.cuh` — a bridge-native
+FlashAttention forward (fp16, d=64/128, causal, GQA) built on the
+bridge's streaming loads, N-stage register staging, smem tiles, MMA
+adapter, and online softmax — oracle-attested against the float64
+reference, red-line benched, then routed by the quilt as the Turing
+backend of flash-attn/FlashInfer/vLLM.
+
 ## Architecture
 
 1. **The bridge header** (`turing_lab/bridge/sm80_on_sm75.cuh`):
