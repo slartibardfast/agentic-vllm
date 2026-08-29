@@ -148,6 +148,28 @@ shape facts and a recorded W4A8-IMMA possibility for later.
 | llama.cpp sm_75 | works |
 | PTX-level cp.async bridge | open-research — the novel deliverable |
 
+## Build findings for the flash-attn quilt (2026-08-29, quilt v1)
+
+The quilt built flash-attn 2.8.3 for sm_75 (35 -> 77-line patch: setup
+arch list, host TORCH_CHECK lift, Turing tile dispatch, splitKV Turing
+tiles, ARCH_SUPPORTS_FLASH gate). Empirical status on TU102:
+
+- **hdim 64: oracle-exact** (max_err 0.00018 vs fp64 reference,
+  non-causal) — the bridge + in-tree sub-80 path delivers correct
+  attention at the primary small-head config.
+- **hdim 128: broken in FA2 2.8.3's own sub-80 path** — non-causal
+  max_err 0.375, causal NaN. Not our quilt: the 2.8.3 sub-80 kernel
+  traits lack the dedicated Q-copy atom the ssiu Turing fork uses
+  (SM75_U32x2_LDSM_N SmemCopyAtomQ, 16 rows per warp at hdim 128).
+- ptxas blowup root-caused operationally: the splitKV TUs with
+  kBlockN=256 instantiations exceed practical ptxas limits on the
+  sub-80 path (3.5+ h at 100% CPU per TU); narrowed to kBlockN 128/64
+  tiles, the same TUs build. Full-resolution fix pending (ptxas -O
+  bisection on the 19 MB per-TU PTX).
+
+Next: port the ssiu Turing d=128 kernel-traits hunks into the quilt,
+then hdim 64+128 both oracle-clean; then FlashInfer/vLLM stages.
+
 ## Refinements to the plan/0006 stage plan
 
 1. The bridge's first consumer is not FA2-from-scratch: start from the
