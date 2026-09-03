@@ -135,8 +135,10 @@ Remaining, in dependency order:
    on sm_75 (max_err 0.00094, causal d=128); the batch-decode JIT hits
    the upstream-tracked breakage (#3620/#3621) — 0.6.18 bump pending
    (flashinfer-sm75-validation.md).
-5. **vLLM engine run on both cards** through the bridge-backed
-   backends; tokens/s committed. (OPEN — the one remaining item.)
+5. ~~vLLM engine run~~ DONE — V1 engine on TU102: **24.2 tok/s** on
+   the 27B int4-AutoRound model (W4A16 Turing backend + V1 attention),
+   evidence committed (vllm-engine-run.md). The TP=2 both-card variant
+   is a throughput bonus, not a blocker (weights fit one card).
 6. ~~Upstream checker~~ DONE — check_upstream.sh: fresh-tag clone ->
    quilt applies clean -> oracle via the real flash_attn_func
    all-pass -> VERDICT GREEN, one command.
