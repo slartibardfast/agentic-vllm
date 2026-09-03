@@ -103,14 +103,29 @@ INT8 tensor cores at 2x FP16. Existing program assets: the k16->2xk8
 split, register-staged pipelines, SASS/occupancy gates, fp64 oracles,
 the ladder, CUDA-graph validation.
 
-## Status
+## Status and remaining sequence
 
-- Bridge header and conformance suite: green (mma adapter bit-exact,
-  staged copy byte-exact at 94.8% of plain streaming, mbarrier, redux,
-  FP8 exhaustive 256/256, bf16 RNE). See `research.md` for the
-  supporting ISA inventory, consumer survey, and prior art.
-- Bridge-native attention forward: in progress.
-- flash-attn / FlashInfer / vLLM quilts and engine run: pending.
+Done: bridge header and conformance suite green (mma adapter bit-exact,
+staged copy byte-exact at 94.8% of plain streaming, mbarrier, redux,
+FP8 exhaustive 256/256, bf16 RNE); flash-attn 2.8.3 quilt v1 builds for
+sm_75 and **hdim 64 is oracle-exact** (max_err 0.00018); ptxas blowup
+on the 256-wide splitKV tiles root-caused and worked around. See
+`research.md` for the ISA inventory, consumer survey, and prior art.
+
+Remaining, in dependency order:
+
+1. **Fragment mapping** (blocks the forward): freeze the m16n8k8
+   register-to-(row, k) layout empirically via the probe harness; the
+   staging, online softmax, masking, and epilogue are already written
+   and unblock the moment the mapping is frozen.
+2. **hdim 128 tile path**: FA2 2.8.3's own sub-80 d=128 kernel is wrong
+   (non-causal err 0.38, causal NaN); port the ssiu fork's kernel-traits
+   fix (SmemCopyAtomQ, 16 rows/warp) — same mainloop files as item 1.
+3. **FlashInfer sm_75 validation** (v0.6.18; upstream breakage #3620
+   and its fix #3621 to check).
+4. **vLLM engine run on both cards** through the bridge-backed
+   backends; tokens/s committed.
+5. **Upstream checker** (fresh checkout -> quilt -> oracle -> green).
 
 ## Acceptance
 
