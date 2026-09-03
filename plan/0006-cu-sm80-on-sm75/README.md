@@ -131,11 +131,15 @@ Remaining, in dependency order:
 3. **hdim 128 tile path**: FA2 2.8.3's own sub-80 d=128 kernel is wrong
    (non-causal err 0.38, causal NaN); port the ssiu fork's kernel-traits
    fix (SmemCopyAtomQ, 16 rows/warp) — same mainloop files as item 1.
-4. **FlashInfer sm_75 validation** (v0.6.18; upstream breakage #3620
-   and its fix #3621 to check).
+4. ~~FlashInfer sm_75 validation~~ RECORDED — 0.6.17 prefill PASSES
+   on sm_75 (max_err 0.00094, causal d=128); the batch-decode JIT hits
+   the upstream-tracked breakage (#3620/#3621) — 0.6.18 bump pending
+   (flashinfer-sm75-validation.md).
 5. **vLLM engine run on both cards** through the bridge-backed
-   backends; tokens/s committed.
-6. **Upstream checker** (fresh checkout -> quilt -> oracle -> green).
+   backends; tokens/s committed. (OPEN — the one remaining item.)
+6. ~~Upstream checker~~ DONE — check_upstream.sh: fresh-tag clone ->
+   quilt applies clean -> oracle via the real flash_attn_func
+   all-pass -> VERDICT GREEN, one command.
 
 ## Acceptance
 
