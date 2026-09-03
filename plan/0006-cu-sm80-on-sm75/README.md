@@ -120,12 +120,14 @@ Remaining, in dependency order:
    m16n8k8 register grid; six kernel bugs fixed in sequence (cvta,
    k-step count, staging bounds, running max, rescale scale, and the
    oracle's own 1-D launch).
-2. **Forward tuning**: v1 is correctness-first and untuned — 15.2
-   TFLOP/s causal at s=8192 d=64 vs torch SDPA's 32.1 on the same
-   shape (47 percent). The gap is the synchronous single-buffer
-   staging; the bridge's N-stage register pipeline (the 94.8-percent
-   red-line primitive) plus the schedule-space search closes it.
-   d=128 and GQA extension, then the same gates.
+2. ~~Forward tuning + d=128/GQA~~ DONE — double-buffered K/V register
+   pipeline and half2-vectorized softmax exp (native
+   ex2.approx.f16x2); d=64 16.3 TFLOP/s causal. Templated over head
+   dim with GQA: the oracle suite is ALL GREEN across d=64/d=128 x
+   MHA/GQA-8:1 x causal/full (max_err 0.00006..0.00043). d=128 runs
+   single-buffered at 10.6 (a 32-row KV tile would restore double
+   buffering); the remaining gap to SDPA is scalar LDS fragment
+   loads — ldmatrix (native) is the next lever.
 3. **hdim 128 tile path**: FA2 2.8.3's own sub-80 d=128 kernel is wrong
    (non-causal err 0.38, causal NaN); port the ssiu fork's kernel-traits
    fix (SmemCopyAtomQ, 16 rows/warp) — same mainloop files as item 1.
