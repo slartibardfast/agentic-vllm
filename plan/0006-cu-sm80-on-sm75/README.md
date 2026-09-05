@@ -140,14 +140,24 @@ Remaining, in dependency order:
    in flashinfer-sm75-validation.md.
 5. ~~vLLM engine run~~ DONE — V1 engine on TU102: **24.2 tok/s** on
    the 27B int4-AutoRound model (W4A16 Turing backend + V1 attention),
-   evidence committed (vllm-engine-run.md). Correction (2026-09-05):
-   on capability (7,5) the V1 selector auto-selects TRITON_ATTN
-   (FLASH_ATTN/FLASHINFER are gated >= (8,0), and the FLASH_ATTN
-   backend imports the vendored vllm_flash_attn, not the quilt-patched
-   package) — so that run's attention was Triton, not the bridge.
-   Open: wire a bridge attention backend in the fork so engine
-   attention rides the bridge (the plan's thin-dispatch-adapter rule),
-   then A/B against TRITON_ATTN; TP=2 both-card numbers.
+   evidence committed (vllm-engine-run.md); TP=2 both cards 76.7 tok/s
+   aggregate short-context (9.9/6.4 end-to-end at ctx 512/2048).
+   Correction (2026-09-05): on capability (7,5) the V1 selector
+   auto-selects TRITON_ATTN (FLASH_ATTN/FLASHINFER are gated >= (8,0),
+   and the FLASH_ATTN backend imports the vendored vllm_flash_attn,
+   not the quilt-patched package) — so engine attention was Triton,
+   not the bridge. CLOSED same day: `BridgeAttentionBackend` (the
+   plan's thin dispatch adapter, design rule 3) auto-selects on sm_75
+   and calls the real `flash_attn_func` per layer; quilt v3 adds
+   bottom-right causal (q0, chunked prefill with prefix) and the
+   causal zero-padding route; profiler evidence
+   (`vllm-bridge-routing-trace.json.gz`) shows `bridge_fwd_kernel<128>`
+   firing per layer per step inside the engine; full A/B vs TRITON_ATTN
+   committed (vllm-engine-run.md) — parity at ctx 2048 single-card,
+   behind at short context (python dispatch + paged-KV gather; the
+   varlen/paged bridge kernel is backlog). head_dim 256 (the 27B)
+   declines to TRITON by scope — d=256 needs the 32-row KV tile +
+   Q-in-registers restructuring (backlog).
 6. ~~Upstream checker~~ DONE — check_upstream.sh: fresh-tag clone ->
    quilt applies clean -> oracle via the real flash_attn_func
    all-pass -> VERDICT GREEN, one command.
