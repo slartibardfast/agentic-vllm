@@ -162,6 +162,23 @@ Remaining, in dependency order:
    quilt applies clean -> oracle via the real flash_attn_func
    all-pass -> VERDICT GREEN, one command.
 
+## Correctness gate (2026-09-05)
+
+A numerics-before-timing pause validated the stack end to end
+(vllm-correctness-gate.md + gate-logs/ in the fork): bridge vs TRITON
+PPL within 0.007% (1.5B d=128 and 0.5B d=64), chunked prefill and
+prefix caching bit-identical on the bridge (the q0/bottom-right workout),
+the 27B hybrid stack coherent to ctx 32768 with stable 512-token decode,
+TP1 vs TP2 greedy identity 3/3. The gate caught one real kernel defect
+the oracles could not see: real-activation RAW dot products exceed fp16
+range, so packing raw S and m into half before subtracting saturated to
+inf and inf - inf = NaN. Fixed by subtracting in fp32 before the half
+conversion; regression-locked with in_scale=100 magnitude oracle cases
+(fwd_oracle.cu), route-level checks, and the engine gate itself. Quilt
+re-verified VERDICT GREEN after the fix. Remaining backlog unchanged:
+architectural backend speedup (paged/varlen kernel), d=256 tiles,
+ldmatrix loads.
+
 ## Acceptance
 
 1. flash-attn and FlashInfer releases compile for sm_75 via the quilt
