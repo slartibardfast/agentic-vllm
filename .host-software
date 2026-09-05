@@ -27,6 +27,19 @@
 	artifact  = target/release/host-lint 5ea6e94d17e7a860c9809728eee988f23caffe45e2d958628835fd44271ec645
 	hooks     = pre-commit
 
+[software "deep-research-skills"]
+	# The Z.ai/ZCode research-skill lane (plan: materialized 2026-09-05).
+	# Upstream Weizhena/Deep-Research-skills; the fork carries the additive
+	# ZCode edition (skills/research-zcode-en|-zh): fully targeted at Z.ai
+	# backends (WebSearch/WebFetch/webReader, Agent-tool parallelism),
+	# symmetric international/chinese endpoint option in both editions.
+	# No build: install means copying a skills/research-zcode-* tree into
+	# ~/.agents/skills/ (skills are discovered at session start).
+	url      = https://github.com/connollydavid/Deep-Research-skills.git
+	pin      = 8b5cdf4cc6b86d47f3c96d030baf39ea95ae5bc0
+	worktrees =
+	worktree  = master 8b5cdf4cc6b86d47f3c96d030baf39ea95ae5bc0
+
 [software "host-lifecycle"]
 	# The lifecycle binary the phases run through. Recorded so the gate can
 	# verify the local binary against the published release the same way.
