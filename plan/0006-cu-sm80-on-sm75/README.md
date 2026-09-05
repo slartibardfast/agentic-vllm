@@ -131,14 +131,23 @@ Remaining, in dependency order:
 3. **hdim 128 tile path**: FA2 2.8.3's own sub-80 d=128 kernel is wrong
    (non-causal err 0.38, causal NaN); port the ssiu fork's kernel-traits
    fix (SmemCopyAtomQ, 16 rows/warp) — same mainloop files as item 1.
-4. ~~FlashInfer sm_75 validation~~ RECORDED — 0.6.17 prefill PASSES
-   on sm_75 (max_err 0.00094, causal d=128); the batch-decode JIT hits
-   the upstream-tracked breakage (#3620/#3621) — 0.6.18 bump pending
-   (flashinfer-sm75-validation.md).
+4. ~~FlashInfer sm_75 validation~~ RECORDED — 0.6.18: prefill PASSES
+   (max_err 0.00094, causal d=128) and batch decode PASSES multi-request
+   (b up to 16, mixed lengths, both kernel variants, max_err <= 0.00072)
+   — the earlier multi-request fault claim is RETRACTED: our harness fed
+   a non-contract paged-cache shape; with `(num_pages, 2, page_size, h,
+   d)` there is no sm_75 breakage to file upstream. Throughput recorded
+   in flashinfer-sm75-validation.md.
 5. ~~vLLM engine run~~ DONE — V1 engine on TU102: **24.2 tok/s** on
    the 27B int4-AutoRound model (W4A16 Turing backend + V1 attention),
-   evidence committed (vllm-engine-run.md). The TP=2 both-card variant
-   is a throughput bonus, not a blocker (weights fit one card).
+   evidence committed (vllm-engine-run.md). Correction (2026-09-05):
+   on capability (7,5) the V1 selector auto-selects TRITON_ATTN
+   (FLASH_ATTN/FLASHINFER are gated >= (8,0), and the FLASH_ATTN
+   backend imports the vendored vllm_flash_attn, not the quilt-patched
+   package) — so that run's attention was Triton, not the bridge.
+   Open: wire a bridge attention backend in the fork so engine
+   attention rides the bridge (the plan's thin-dispatch-adapter rule),
+   then A/B against TRITON_ATTN; TP=2 both-card numbers.
 6. ~~Upstream checker~~ DONE — check_upstream.sh: fresh-tag clone ->
    quilt applies clean -> oracle via the real flash_attn_func
    all-pass -> VERDICT GREEN, one command.
