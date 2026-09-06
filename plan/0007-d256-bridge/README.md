@@ -28,6 +28,26 @@ at d=256 (FA2 launch bodies gate at __CUDA_ARCH__ >= 800; its shipped
 d=256 configs need 96-128KB smem), but real at d<=128 as the
 same-hardware baseline harness this plan builds first.
 
+## Gate 0 - no silent wrongness (hard gate)
+
+Every configuration that produces a recorded number must pass a
+differential check against an independent reference in the same run -
+torch fp32/fp64 einsum AND a second agreeing reference where possible -
+before the number exists. A path that launches and returns wrong tensors
+is disqualified outright and recorded as a blocker; its performance is
+never reported, not even as a footnote. This gate is blocking: assert,
+not warn.
+
+First application (2026-09-06): FlashInfer 0.6.18 prefill on sm_75 is
+DISQUALIFIED by gate 0 - silently wrong in every probed configuration
+(MHA/GQA x causal/non-causal, d=128/256, ctx 8-2048; max_err up to 4.24
+against two agreeing references). Its decode path passed the same gate
+and its numbers are recorded as the baseline. Nothing in the delivered
+bridge stack presents silently wrong: the kernel rides the fp64 oracle
+(with the fp16-saturation magnitude regressions), the backend suite
+compares against raw-tensor references, the engine gate runs identity
+and PPL checks, and the macro gate consumes only gate-passing arms.
+
 ## Step 0 - same-hardware baselines (route C)
 
 1. FlashInfer 0.6.18 (installed in the lane venv): verify the d=256

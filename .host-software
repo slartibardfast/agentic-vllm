@@ -10,7 +10,7 @@
 	url          = https://github.com/slartibardfast/vllm.git
 	pin          = 79378fe6e87687c63ceab9815c68bf027d491868
 	worktrees    =
-	worktree     = sm75-marlin f6216a2e1c00e3e2637e7256cc87a0dfc5c1c550c19a44541a3cd4ff9242321f827964b47c81add9dd7cfcb7008c13c77bca
+	worktree     = sm75-marlin 90e4e712159077d4af10b3857ed6f2679ea214b200e3e2637e7256cc87a0dfc5c1c550c19a44541a3cd4ff9242321f827964b47c81add9dd7cfcb7008c13c77bca
 	repro-waiver = call/0002
 
 [software "host-lint"]
