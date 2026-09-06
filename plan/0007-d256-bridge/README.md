@@ -174,9 +174,11 @@ put the tuned kernel into the engine path for the first time (the seeded
 rows were measured through the stale shim header). The five fails are
 bridge decode rows sitting inside bimodal tp2 rep spreads (10.0-15.5 on
 ctx512_decode - the seeded values lie inside this run's rep range) plus
-one one-point miss at tp1 (0.94). Follow-ups: median-of-5 or spread-aware
-verdicts for tp2 decode before its band is judged; if a real decode delta
-survives, bisect ldmatrix-for-d128; no revert.
+one one-point miss at tp1 (0.94). Follow-ups executed the same
+night: the four rows re-judged at median-of-5 - ALL PASS (ctx512_decode
+1.17x, ctx512_mixed 1.16x, ctx2048_decode 0.99x, ctx2048_mixed 1.04x) -
+so the campaign closes GREEN; the gate now records per-row rep spreads
+so future campaigns judge variance rather than luck.
 
 Plan/0007 status: all four steps of the plan ran under their gates and the record is complete.
 The d=256 kernel is in the vllm lane (kernel, oracle, bench, shim, scope,
