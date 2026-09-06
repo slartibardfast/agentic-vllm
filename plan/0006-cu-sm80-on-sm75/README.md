@@ -216,3 +216,50 @@ short-decode), so they were re-seeded under the clean protocol at kernel
 vllm-engine-run.md (bridge prefill-only 13.4k tok/s at ctx2048 on one
 card, 3.1x triton; decode-phase 33-35 vs triton 48-51 — the padded-Q
 tile and gather backlog, unchanged).
+
+### Head-shape design inputs (2026-09-06, deep-research run)
+
+The deep-research stack's first full loop (outline -> 10-item deep phase,
+every item validated 17/17 fields -> report) answered the head-shape
+question. Full record: research/headshape/report.md (raw JSONs beside it).
+
+Verdict on {64,128}: an overfit, now evidenced. The 2025-2026 frontier
+full-attention dim is 256 (Qwen3-Next blog: "increase the dimension per
+attention head from 128 to 256"; the whole Qwen3.5/3.6/3.8 line, Gemma-2/3;
+Gemma-4 adds per-layer heterogeneous 512 globals), against a 2023-2025
+generation that was uniformly 128. SageAttention #47's "head dim greater
+than 128 is quite rare" (2024-11) is the canonical narrow-set statement,
+falsified on its own thread by mid-2026. FA2 instantiates
+{32,64,96,128,192,256} for exactly this reason. Qwen3.8-27B is
+architecturally identical to Qwen3.6-27B (verified three ways: local
+configs, local GGUF metadata, public config.json) - head_dim 256, 24/4
+heads GQA 6:1, dense, hybrid 3:1 GDN:full.
+
+Route decision for d=256: **route B, k-chunked 256 on the existing 128
+pipeline, first.** The 128 fp32 O-accumulator registers are unavoidable in
+any route (output is 256 wide), so B's work is a strict subset of A's; B
+keeps our current 51KB smem and adds two staging passes + two barriers per
+tile. Precedent: FlashAttention #1474/#1483 (FFPA) does MMA-level head-dim
+chunking at 88% of peak (105 TFLOPS on L20, D=512, fp32 accumulation), and
+llama.cpp's fattn-mma Turing tables implement exactly this structure for
+256/256 through 576/512 - including the two tricks worth stealing: fp16
+PV accumulation to halve accumulator registers (GeForce Turing halves the
+fp32-accumulate mma rate), and time-multiplexed K/V smem tiles with XOR
+swizzle. Route A (32-row KV tiles + Q-in-registers) only if profiling
+shows B's staging overhead is material. Route C honesty: "unmodified
+FA2/FlashInfer on sm_75" is a myth for d=256 (FA2 launch bodies gate at
+__CUDA_ARCH__ >= 800 with a fatal printf; its shipped d=256 configs need
+96-128KB smem; FlashInfer d=256 fits in exactly 65536B - zero headroom),
+but the route works at d=64/128 as the same-hardware baseline harness this
+plan always intended, and FlashInfer's sm75 breakages are host-side smem
+accounting bugs, not ISA limits (un-gating needs an sm75 CI lane plus a
+one-line vLLM capability revert).
+
+Surroundings recorded for the roadmap: the 75% GDN linear-attention side
+of the 27B never touches this kernel (served by FLA Triton on sm_75, but
+Triton's tl.dot lost tensor cores below sm80 in Triton 3.3); MLA
+(576/512) and asymmetric (qk,v) tuples are reachable by the same k-chunked
+structure (llama.cpp proves it on Turing); numerics invariants carry over
+(fp32 subtract before h2exp2; d=256 widens |S|; softcap needed for the
+Gemma family). Next action: design the k-chunked d=256 variant of
+flash_fwd_sm75.cuh, acceptance through the fp64 oracle and the macro gate.
