@@ -187,3 +187,19 @@ ldmatrix loads.
    context-length scaling committed against the prior engine attention.
 3. Upstream tracking in one command: fresh checkout -> quilt -> green.
 4. Every quilt patch is a primitive substitution.
+
+### weco-tuned forward kernel (2026-09-06)
+
+The first local weco run (observe 1c5a7d79, local mode, ZCode as the
+intelligence) took the bridge forward kernel from 26.0 to 59.7 TFLOP/s
+(2.30x, sum of s=8192 causal TFLOP/s over d64+d128) in the isolated
+.weco workspace: causal tile skip (the kernel computed its whole masked
+upper triangle and discarded it), ldmatrix x4/x4.trans B-fragments
+(native on sm_75; .trans distribution is exactly the mma B-fragment),
+and single-buffered d64 for 2 CTAs/SM. Every step ran under gpu-lease
+exclusive with the fp64 oracle gating all timing; the failed
+transposed-V branch is logged with numbers in the observe store, and
+mma.m16n8k16 was confirmed absent on Turing (the primitives' k16 entry
+is a 2x k8 wrapper). Applied to the lane at 69e91020 with the lane
+oracle, bench and the 15-test backend suite green; the one red probe
+was a missing CUDA_HOME in the shell, not the kernel.
