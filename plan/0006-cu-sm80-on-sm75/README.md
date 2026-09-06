@@ -203,3 +203,16 @@ mma.m16n8k16 was confirmed absent on Turing (the primitives' k16 entry
 is a 2x k8 wrapper). Applied to the lane at 69e91020 with the lane
 oracle, bench and the 15-test backend suite green; the one red probe
 was a missing CUDA_HOME in the shell, not the kernel.
+
+### Macro gate formalized (2026-09-06)
+
+The engine-level A/B is now a gate, not an anecdote: vllm_macro_gate.py
+(protocol v2: prefix caching disabled, median of 3, gpu-lease per arm,
+control-arm invalidation on drift) runs at the end of every A/B
+campaign. First formal run came back RED as designed — the 2026-09-05
+single-run baselines failed the triton control check (1.50x/1.51x on
+short-decode), so they were re-seeded under the clean protocol at kernel
+69e91020; the next campaign is judged against the seeded table in
+vllm-engine-run.md (bridge prefill-only 13.4k tok/s at ctx2048 on one
+card, 3.1x triton; decode-phase 33-35 vs triton 48-51 — the padded-Q
+tile and gather backlog, unchanged).
