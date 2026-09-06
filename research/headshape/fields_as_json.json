@@ -1,0 +1,27 @@
+{
+ "architecture": [
+  "name",
+  "head_dims",
+  "qkv_dim_divergence",
+  "kv_heads_gqa",
+  "hybrid_pattern",
+  "heterogeneous_dims"
+ ],
+ "kernel_support": [
+  "supported_dims",
+  "capability_gate",
+  "fallback_semantics",
+  "ci_hardware_coverage"
+ ],
+ "performance": [
+  "turing_baseline",
+  "d256_feasibility",
+  "cost_analysis"
+ ],
+ "design_fit": [
+  "route",
+  "recommendation",
+  "numerics_risks",
+  "demand_weighting"
+ ]
+}
