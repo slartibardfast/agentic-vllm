@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+# gpu-lease: tiered access scheduler for this host's two GPUs.
+#
+# Policy (operator-set):
+#   exclusive   both GPUs and the interconnect. Mandatory for NVLink / TP=2
+#               jobs; they share everything by definition, so they serialize
+#               against all other work. Also for any job too large to pair.
+#   gpu0|gpu1   two small (VRAM-fitting) jobs may run simultaneously IF AND
+#               ONLY IF the machine is fully partitioned: each job gets one
+#               ENTIRE GPU (CUDA_VISIBLE_DEVICES pinned, never shared) plus
+#               dedicated CPU cores (--cpuset) and a dedicated RAM budget
+#               (--mem-gb). A third job, or an exclusive, waits.
+#
+# Usage:
+#   gpu-lease status
+#   gpu-lease [--mode exclusive|gpu0|gpu1] [--wait SECS] [--cpuset LIST]
+#             [--mem-gb N] -- COMMAND [ARGS...]
+#
+# Defaults: --mode exclusive, --wait 900 (0 fails fast if the turn is not
+# free).
+#
+# Mechanics: flock on master.lease (exclusive takes LOCK_EX, partition takes
+# LOCK_SH) plus a LOCK_EX per-GPU lease for partition mode; the lock fds are
+# inherited by COMMAND, so a lease lives exactly as long as the job that
+# holds it. Before a job starts, nvidia-smi must show no foreign compute
+# processes on the granted GPUs (bypass detection: a process that skipped
+# the lease is never run on top of).
+
+set -euo pipefail
+
+die() { echo "gpu-lease: $*" >&2; exit 2; }
+log() { echo "gpu-lease: $*" >&2; }
+
+usage() {
+    sed -n '2,26p' "$0" | sed 's/^#\s\{0,1\}//'
+    exit 0
+}
+
+if [ $# -eq 0 ]; then
+    usage
+fi
+
+UID_N="$(id -u)"
+if [ -d "/run/user/$UID_N" ]; then
+    LOCKDIR="/run/user/$UID_N/gpu-lease"
+else
+    LOCKDIR="/tmp/gpu-lease-$UID_N"
+fi
+LOCKDIR="${GPU_LEASE_DIR:-$LOCKDIR}"
+mkdir -p "$LOCKDIR"
+
+MODE=exclusive
+WAIT=900
+CPUSET=
+MEMGB=
+
+# ---- internal verbs (re-invocation under an already-held lock) ------------
+if [ "${1:-}" = "--_slot" ] || [ "${1:-}" = "--_run" ] || [ "${1:-}" = "--_runx" ]; then
+    VERB="$1"; shift
+    IDX=; CMD=()
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --mode) MODE="$2"; shift 2;;
+            --idx) IDX="$2"; shift 2;;
+            --wait) WAIT="$2"; shift 2;;
+            --cpuset) CPUSET="$2"; shift 2;;
+            --mem-gb) MEMGB="$2"; shift 2;;
+            --) shift; CMD=("$@"); break;;
+            *) die "internal arg error: $1";;
+        esac
+    done
+    [ ${#CMD[@]} -gt 0 ] || die "internal: no command"
+else
+    VERB=
+    WANT_STATUS=0
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            status) WANT_STATUS=1; shift;;
+            --mode) MODE="$2"; shift 2;;
+            --wait) WAIT="$2"; shift 2;;
+            --cpuset) CPUSET="$2"; shift 2;;
+            --mem-gb) MEMGB="$2"; shift 2;;
+            --help|-h) usage;;
+            --) shift; break;;
+            *) die "unknown argument: $1 (use -- before the command)";;
+        esac
+    done
+    if [ "$WANT_STATUS" = 1 ]; then
+        MODE=status
+    fi
+    CMD=("$@")
+    if [ "$MODE" = exclusive ] && { [ -n "$CPUSET" ] || [ -n "$MEMGB" ]; }; then
+        log "WARNING: --cpuset/--mem-gb apply to partition mode only; ignored for exclusive"
+    fi
+fi
+
+# ---- status ---------------------------------------------------------------
+if [ "$MODE" = status ]; then
+    for lock in master.lease gpu0.lease gpu1.lease; do
+        if flock -n "$LOCKDIR/$lock" true 2>/dev/null; then
+            echo "$lock: free"
+        else
+            echo "$lock: held"
+        fi
+    done
+    echo "compute apps:"
+    nvidia-smi --query-compute-apps=gpu_uuid,pid,process_name --format=csv,noheader || true
+    exit 0
+fi
+
+[ ${#CMD[@]} -gt 0 ] || die "no command given (use -- COMMAND)"
+
+# ---- gpu helpers ----------------------------------------------------------
+gpu_count() { nvidia-smi --query-gpu=index --format=csv,noheader | wc -l; }
+
+# pids_with_compute IDX: print pids running compute on gpu index IDX
+pids_with_compute() {
+    local idx="$1"
+    nvidia-smi --query-compute-apps=gpu_bus_id,pid --format=csv,noheader 2>/dev/null \
+    | awk -F', *' -v idx="$1" -v map="$(nvidia-smi --query-gpu=index,pci.bus_id --format=csv,noheader)" '
+        BEGIN { n = split(map, m, "\n"); for (i = 1; i <= n; i++) { split(m[i], f, ", "); bus[f[1]] = f[2] } }
+        { if (tolower(bus[idx]) == tolower($1)) print $2 }' \
+    | sort -u
+}
+
+require_idle() {
+    local idx="$1"
+    local pids
+    pids="$(pids_with_compute "$idx")"
+    if [ -n "$pids" ]; then
+        die "gpu$idx has foreign compute processes (bypass detected): $pids"
+    fi
+}
+
+# ---- pinning (partition mode) ---------------------------------------------
+# Cores: taskset (this user manager silently ignores AllowedCPUs; taskset is
+# kernel-level and always effective). RAM: systemd MemoryMax, honored here;
+# advisory-only if the user scope is unavailable.
+exec_pinned() {
+    local pre=()
+    if [ -n "$CPUSET" ]; then
+        pre+=( taskset -c "$CPUSET" )
+    fi
+    if [ -n "$MEMGB" ]; then
+        if systemd-run --user --scope --quiet true >/dev/null 2>&1; then
+            exec systemd-run --user --scope --quiet -p "MemoryMax=${MEMGB}G" \
+                ${pre[@]+"${pre[@]}"} "${CMD[@]}"
+        fi
+        log "WARNING: systemd scope unavailable; RAM budget ${MEMGB}G is advisory only"
+    fi
+    exec ${pre[@]+"${pre[@]}"} "${CMD[@]}"
+}
+
+# ---- exclusive path -------------------------------------------------------
+if [ "$MODE" = exclusive ] && { [ -z "$VERB" ] || [ "$VERB" = "--_runx" ]; }; then
+    if [ "${VERB:-}" = "--_runx" ]; then
+        require_idle 0
+        require_idle 1
+        log "granted exclusive; starting: ${CMD[*]}"
+        exec "${CMD[@]}"
+    fi
+    if ! flock -n "$LOCKDIR/master.lease" true 2>/dev/null; then
+        log "exclusive: waiting up to ${WAIT}s for partition holders to drain"
+    fi
+    exec flock -w "$WAIT" "$LOCKDIR/master.lease" "$0" --_runx --mode exclusive --wait "$WAIT" -- "${CMD[@]}"
+fi
+
+# ---- partition path -------------------------------------------------------
+case "$MODE" in
+    gpu0) IDX=0;;
+    gpu1) IDX=1;;
+    *) die "mode must be exclusive, gpu0, or gpu1 (got: $MODE)";;
+esac
+[ "$IDX" -lt "$(gpu_count)" ] || die "gpu$IDX does not exist ($(gpu_count) GPUs present)"
+
+if [ "${VERB:-}" = "--_run" ]; then
+    require_idle "$IDX"
+    export CUDA_VISIBLE_DEVICES="$IDX"
+    log "granted gpu$IDX (CUDA_VISIBLE_DEVICES=$IDX, cpuset=${CPUSET:-host-default}, mem-gb=${MEMGB:-unbounded}); starting: ${CMD[*]}"
+    exec_pinned
+fi
+if [ "${VERB:-}" = "--_slot" ]; then
+    exec flock -w "$WAIT" "$LOCKDIR/gpu$IDX.lease" "$0" --_run --mode "$MODE" --idx "$IDX" --wait "$WAIT" --cpuset "$CPUSET" --mem-gb "$MEMGB" -- "${CMD[@]}"
+fi
+exec flock -w "$WAIT" -s "$LOCKDIR/master.lease" "$0" --_slot --mode "$MODE" --idx "$IDX" --wait "$WAIT" --cpuset "$CPUSET" --mem-gb "$MEMGB" -- "${CMD[@]}"

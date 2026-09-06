@@ -1,0 +1,24 @@
+{
+  "mcp": {
+    "servers": {
+      "zai-web-search": {
+        "type": "stdio",
+        "command": "/opt/repo/agentic-vllm/.zcode/zai-mcp-bridge",
+        "args": ["web-search"],
+        "timeoutMs": 60000
+      },
+      "zai-web-reader": {
+        "type": "stdio",
+        "command": "/opt/repo/agentic-vllm/.zcode/zai-mcp-bridge",
+        "args": ["web-reader"],
+        "timeoutMs": 60000
+      },
+      "zai-zread": {
+        "type": "stdio",
+        "command": "/opt/repo/agentic-vllm/.zcode/zai-mcp-bridge",
+        "args": ["zread"],
+        "timeoutMs": 60000
+      }
+    }
+  }
+}

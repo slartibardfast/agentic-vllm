@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Bridge for the z.ai remote MCP servers (see .zcode/config.json).
+#
+# ZCode does not expand ${...} templates in configuration-file MCP servers
+# (zcode-guide diagnosing-mcp, pitfall 3), so the setup-generated
+# "Authorization: Bearer ${Z_AI_API_KEY}" headers would reach the endpoint
+# literally and auth would fail. Instead the config points at this
+# executable: it runs as ZCode's child, inherits the exported Z_AI_API_KEY,
+# expands it here, and bridges stdio to the z.ai streamable-HTTP endpoint
+# through mcp-proxy (fetched on demand by uv, no npm needed on this host).
+#
+# Usage: zai-mcp-bridge {web-search|web-reader|zread}
+set -euo pipefail
+
+: "${Z_AI_API_KEY:?export Z_AI_API_KEY before starting ZCode (see ~/.bashrc)}"
+command -v uv >/dev/null 2>&1 || { echo "zai-mcp-bridge: uv not found" >&2; exit 2; }
+
+case "${1:-}" in
+    web-search) URL="https://api.z.ai/api/mcp/web_search_prime/mcp" ;;
+    web-reader) URL="https://api.z.ai/api/mcp/web_reader/mcp" ;;
+    zread)      URL="https://api.z.ai/api/mcp/zread/mcp" ;;
+    *) echo "usage: zai-mcp-bridge {web-search|web-reader|zread}" >&2; exit 2 ;;
+esac
+
+exec uv run --no-project --quiet --with mcp-proxy --with 'mcp<2' \
+    mcp-proxy --transport streamablehttp \
+    --headers Authorization "Bearer ${Z_AI_API_KEY}" "$URL"

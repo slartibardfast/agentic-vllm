@@ -99,3 +99,37 @@ Multi-GPU strategies at N=K=4096 (staged config, oracle-checked):
 - fp32 partial outputs for kshard2; repack interleave for regdequant;
   deep software pipeline. LLM-in-the-loop proposal hooks on propose.py's
   row interface.
+
+## weco integration (2026-09-06)
+
+The LLM-in-the-loop proposer this plan anticipated is here: the weco
+stack, adopted forked-output only.
+
+1. **CLI** (uv tool install, not a lane): weco 0.4.0 from
+   connollydavid/weco-cli at 0111f27, upstream WecoAI/weco-cli. Local
+   mode by default, no account, no telemetry.
+2. **Skill lane**: software/weco-skill pinned at 707e132, installed into
+   ~/.zcode/skills/weco by `weco setup zcode --zai-endpoint intl
+   --local`. Either/or endpoint rule respected: intl chosen for this run.
+3. **z.ai MCP servers, bridged**: ZCode does not expand `${...}` in
+   configuration-file MCP servers (zcode-guide diagnosing-mcp pitfall 3),
+   so the setup-generated `Bearer ${Z_AI_API_KEY}` header form would
+   reach api.z.ai literally. All three remote servers instead point at
+   .zcode/zai-mcp-bridge, which expands the key from its inherited
+   environment and bridges stdio to streamable-HTTP via mcp-proxy
+   (pinned mcp<2: the newest SDK moved request_ctx). Verified end to end
+   against api.z.ai: initialize plus tools/list on web_search_prime
+   returned the tool schema. zai-vision stays unwired: it needs npx,
+   absent on this host.
+4. **GPU discipline**: every weco eval and every turing_lab measurement
+   runs under the repo-root `gpu-lease`. exclusive for NVLink / TP=2 and
+   any large job; two small jobs may pair only with a full partition
+   (one entire GPU each plus taskset cores and a systemd MemoryMax
+   budget; the user manager silently ignores AllowedCPUs, so cores ride
+   taskset). Bypass detection via nvidia-smi compute apps refuses to run
+   on top of an unleased process. Any evaluate.sh contract must declare
+   its lease mode.
+
+Open gaps, to fix in the weco-cli fork: setup defaults to upstream's
+skill URL (--local is required until then) and emits the non-expanding
+header form instead of the bridge.

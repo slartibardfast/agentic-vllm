@@ -50,3 +50,14 @@
 	build     = cargo build --release --locked
 	deploy    = host-lifecycle
 	artifact  = target/release/host-lifecycle bd701a3723211f71787714d32b70c2be2e39a0b1c5ff5c4c4ca44b1baf8192e1
+
+[software "weco-skill"]
+	# The weco optimization-skill lane, adopted forked-output only (no
+	# agentic-weco machinery on this host): SKILL.md + references installed
+	# into ~/.zcode/skills/weco by `weco setup zcode --local <worktree>`.
+	# The CLI is NOT a lane: uv tool install from the fork directly,
+	# weco 0.4.0, resolved sha 0111f27e0e370d2ccac4e06e28a6398bda48a95b.
+	url      = https://github.com/connollydavid/weco-skill.git
+	pin      = 707e1324a2923249617256b03f0d9d2bbf17dff3
+	worktrees =
+	worktree  = main 707e1324a2923249617256b03f0d9d2bbf17dff3
