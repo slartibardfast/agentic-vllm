@@ -36,7 +36,7 @@
 	# No build: install means copying a skills/research-zcode-* tree into
 	# ~/.agents/skills/ (skills are discovered at session start).
 	url      = https://github.com/connollydavid/Deep-Research-skills.git
-	pin      = b375424ef4abdb08dbf054bc98ae96c35b9e52f8
+	pin      = 8f87771f361cd15ab46efa0e453130aca68eacdb
 	worktrees =
 	worktree  = master b375424ef4abdb08dbf054bc98ae96c35b9e52f8
 
