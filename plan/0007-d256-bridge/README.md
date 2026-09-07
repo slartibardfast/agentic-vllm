@@ -220,3 +220,21 @@ the decode-shaped d128 attention kernel under TP2 lockstep. The
 recorded bisect (per-tile barrier pattern vs stage_now staging width
 under lockstep) is the next campaign; the d=256 objective and every
 other plan/0007 deliverable stand.
+
+### Decode bisect record (2026-09-07)
+
+Bisect executed per the recorded follow-up. Findings: (1) the d128
+decode-shaped instantiation (kLd=false, pre-tuning loads) is instruction-
+equivalent to the plan/0006 kernel plus the tile-skip preamble, softcap
+branch and exp_scale indirection - all ablated as sub-noise; (2) ptxas
+reports zero spills in every instantiation (d256 sits at 255/254
+registers - the ceiling the research predicted, worth watching); (3) the
+kernel-isolated A/B shows the TUNED kernel faster than the plan/0006
+kernel at the decode shape (2353 vs 2521 us), yet the tp2 ENGINE decode
+measures tuned ~13.4-14.1 vs stale ~15.5-16.4 tok/s - the deficit
+appears only under TP2 lockstep in the engine, not in the kernel. The
+mechanism is therefore engine-level (per-step scheduling/gather/allreduce
+interaction), not the attention inner loop. Next instrument: nsys/ncu on
+the tp2 decode step, tuned vs stale, both ranks. The macro gate verdict
+stands RED on those two rows until that campaign explains or recovers
+the delta; every other row and deliverable is green.
