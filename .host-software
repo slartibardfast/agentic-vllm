@@ -10,7 +10,7 @@
 	url          = https://github.com/slartibardfast/vllm.git
 	pin          = 79378fe6e87687c63ceab9815c68bf027d491868
 	worktrees    =
-	worktree     = sm75-marlin 711b6898c41951850a2f26a07607de1a40c66763
+	worktree     = sm75-marlin 711b6898c46c6e99bc23728327a43a8028233409
 	repro-waiver = call/0002
 
 [software "host-lint"]
@@ -37,8 +37,9 @@
 	# ~/.agents/skills/ (skills are discovered at session start).
 	url      = https://github.com/connollydavid/Deep-Research-skills.git
 	pin      = 8f87771f361cd15ab46efa0e453130aca68eacdb
+	branch   = master
 	worktrees =
-	worktree  = master b375424ef4abdb08dbf054bc98ae96c35b9e52f8
+	worktree  = master 8f87771f361cd15ab46efa0e453130aca68eacdb
 
 [software "host-lifecycle"]
 	# The lifecycle binary the phases run through. Recorded so the gate can
