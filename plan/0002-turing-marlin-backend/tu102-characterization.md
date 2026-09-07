@@ -98,8 +98,77 @@ Findings:
    register footprint allows only one resident block cannot reach the
    pipes' ceiling.
 
+## Levers and red-lines (added 2026-09-07)
+
+Recorded at the operator's direction. This section carries no repeatable
+dry specifications; it is the performance envelope the measurements above
+prove. Every number below is measured above in this paper or in a
+committed plan record of this host. External claims (upstream kernel
+releases, Triton codegen floors, vendor spec sheets) are not accepted
+here; they live in research/lacunae until verified or measured.
+
+### Red-lines (measured walls)
+
+1. **The FP16 tensor ceiling at the locked clock is 101.7 TFLOP/s** (the
+   flat region beyond two resident blocks). No FP16-tensor kernel on this
+   host crosses it. The current opt kernels at 23-25 and the incumbent at
+   51-57 sit at roughly a quarter and half of it respectively; the
+   remaining gap to the incumbent is pipeline depth, and past the
+   incumbent the headroom to the wall is about two times.
+2. **INT8 tensor math tops at 203 TOPS, exactly twice FP16.** The s4 MMA
+   does not exist on sm_75 (finding 3), so sub-INT8 weights pay register
+   dequantization permanently. The dense-math design space is
+   dequant-to-FP16 versus dequant-to-INT8.
+3. **The k8 wall.** f32-accumulate MMA above k8 is rejected below sm_80
+   (finding 4): every k16 tile is two issues, and the operand-staging cost
+   is inherited by every backend that will ever be written here.
+4. **The occupancy red-line.** One resident block per SM caps the tensor
+   pipes at 43.8 TFLOP/s (finding 7); two reach 101.7. Any candidate
+   configuration whose shared-memory and register footprint allows only
+   one resident block is capped at 43 percent of the ceiling before it
+   runs. This is a legality gate, not a tuning knob.
+5. **A conflicted shared-memory mapping pays half** (finding 5). Swizzle
+   correctness is a correctness-class gate, not an optimization.
+6. **Decode is memory-bound.** Pure read achieves 535 GB/s and the W4A16
+   crossover sits at M* = 47: below it, weight bytes per parameter is the
+   only lever; above it, tensor-pipe efficiency is.
+7. **TP2 communication is measured, not spec'd.** The NVLink path moved
+   43.7 GB/s in the plan/0004 protocol, and at decode batch sizes the
+   allreduce is latency-dominated with the variance owned by the engine,
+   not the kernel (plan/0007 bisect record).
+
+### Levers (what can still drive gains inside the walls)
+
+1. **Dequant-instruction economy.** The contention table prices every ALU
+   op against tensor throughput, and HFMA2 steals about 40 percent less
+   than FFMA or LOP3 at high density. The path from 23-25 toward and past
+   51-57 is fewer total ops per weight: the swizzled lop3+hsub2 stream
+   (regdeq2), the repack interlace that deletes byte_perm, split-K for
+   small M, deeper stages.
+2. **The INT8 tensor track is open and unused.** 203 TOPS is measured and
+   no current kernel touches it (all are FP16-tensor). A W8A8-INT8 row is
+   the only way to double dense math per clock on this silicon; the cost
+   is activation quantization (a numerics project), not a kernel
+   mechanism.
+3. **Weight-byte reduction below four bits.** Below the crossover,
+   decode latency tracks weight bytes at fixed 535 GB/s; W2A16 halves
+   W4's bytes (plan/0005 AutoRound lane).
+4. **Software pipeline depth.** Registers and barriers are the cost
+   currency of the no-cp.async chain (finding 6); register-resident
+   fragments and deeper staging are precisely the incumbent's measured
+   advantage, so the gap decomposition is the work order (plan/0004).
+5. **Engine-level multipliers.** Speculative decoding and KV-byte
+   reduction multiply or protect memory-bound throughput without touching
+   the silicon limits above; both are scoped as research/lacunae items
+   with no numbers accepted yet.
+
+These red-lines are gate inputs: a candidate that violates one is culled
+before any timing, per the standing oracle-before-timing rules.
+
 ## Open lanes (characterization task stays open)
 
 The M-sweep that tests the crossover prediction against real Marlin shapes
 belongs to the reference-backend and search tasks, which own a kernel to
-sweep.
+sweep. The unexploited INT8 tensor track (lever 2) is now an open lane of
+this characterization: an activation-quantization feasibility note is the
+missing prerequisite.
