@@ -207,3 +207,16 @@ tuned 2324/2176 us per launch - the tuned kernel is the faster one).
 Verdict: variance, not regression. Methodology fix recorded: tp2 decode
 rows are judged on medians across at least three engine restarts. The
 d=256 objective is unaffected and delivered.
+
+### Cross-restart gate (2026-09-07)
+
+The gate now samples tp2 arms across three engine restarts (per-row
+median across restarts; tp1 single restart - its rows are stable).
+Verdict under proper sampling: tp1 entirely green (bridge decode
+0.99-1.01, prefill 1.02-1.15); control arm flat everywhere (0.94-1.02);
+tp2 bridge decode rows reproduce at 0.85-0.90 of seeded - a real,
+stable deficit once restart variance is medianed out, concentrated in
+the decode-shaped d128 attention kernel under TP2 lockstep. The
+recorded bisect (per-tile barrier pattern vs stage_now staging width
+under lockstep) is the next campaign; the d=256 objective and every
+other plan/0007 deliverable stand.
