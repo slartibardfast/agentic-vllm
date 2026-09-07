@@ -184,3 +184,19 @@ Plan/0007 status: all four steps of the plan ran under their gates and the recor
 The d=256 kernel is in the vllm lane (kernel, oracle, bench, shim, scope,
 tests) with the 27B routing to BRIDGE proven on both ranks and all 14
 engine gates green.
+
+### Campaign macro gate final (2026-09-07)
+
+Two independent median-of-5 runs of the gate as-coded. Control arm
+perfect in both (28/28 control rows 0.94-1.02). The d=256 objective
+holds: bridge prefill at tp1 ctx2048 = 1.10x-1.18x seeded, tp2 bridge
+prefill never flagged, all d256 rows gated green. But the gate blocks
+the campaign overall: bridge tp2 decode is reproducibly ~15 percent
+below seeded (0.79-0.89 across two runs) and tp1 decode sits at the
+0.95 line - a real regression introduced somewhere in the d128 tuning
+campaign (tile-skip and ldmatrix are fenced out as causes for decode;
+the residual suspect is the per-tile barrier/staging pattern under TP2
+lockstep). Per gate 0 discipline the campaign is recorded RED with the
+bisect plan rather than rerun-lottoed green: next campaign bisects the
+d128 decode regression under TP2 lockstep or ships a decode-selective
+variant. The d=256 objective itself is unaffected and delivered.
