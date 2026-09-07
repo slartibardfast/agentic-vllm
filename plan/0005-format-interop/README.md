@@ -132,6 +132,67 @@ committed and the coverage table below has no uncovered row. The
 engine row (11) is the load-bearing one: without a Turing engine,
 every other row is unreachable on current upstream.
 
+## Research re-baseline (2026-09-07)
+
+The lacuna run (research/lacunae, 20 items, validated, commit ca41764)
+re-baselined every stage of this plan under the operator focus,
+Qwen3.8 + Qwen3.8-Next. Per-stage verdicts; citations live in the corpus:
+
+- **FP8 residency**: the recast path has org prior art (gguf-recast,
+  Rust, reproducible). Upstream degrades FP8 checkpoints to weight-only
+  W8A16 on Turing, so the faithful activation-emulation row is
+  fork-unique and rises in weight. INT8 W8A8 is the native-rate
+  alternative (203 TOPS measured ceiling on TU102).
+- **AutoRound formats**: W4 sym g128 stays the lane (Intel's own W4
+  pattern; g64 only pays at W2/W3). Upstream #52890 (2026-09-07) added
+  CUDA 2/3/5/6/7-bit via the Humming kernels, SM75+: cherry-pick and
+  measure Humming on TU102 before kernel-ladder budget (build versus
+  adopt). Both 27B AutoRound targets ship bf16, so the bf16 recast row
+  is a prerequisite. Landmine: #48905 (W4A8 negative-group-scale
+  corruption).
+- **MXFP4 and NVFP4**: MXFP4 Marlin is closed to Turing on
+  principle (bf16 activations, which Turing lacks); the CUDA nibble-LUT
+  design is the only tensor-core vehicle on sm75. NVFP4 floors at 75
+  with the E4M3-scale bug fixed upstream (#34577); post-fix Turing
+  status is unverified, a gate-0 probe with a falsifiable PPL target. A
+  community Qwen3.8-27B-NVFP4A16 checkpoint advertises Ampere+.
+- **bf16 recast**: gguf-recast is the prior art. Weight-space
+  outliers are expected zero (no mainstream text-LLM body weights over
+  the fp16 maximum have been reported); the real risk is activation
+  space and is runtime, not load-time. The probe fixture bakes fp16 in
+  at AutoRound emission (W4 sym g128, seed 42).
+- **Attention and engine strategy**: the sm75 floor bifurcated. v0.23.0
+  is the last-good FlashInfer base; v0.24.0's drop was deliberate (PR
+  #45375) and the restore path is real but stalled (PR #55380, tested
+  on the Qwen3.8-27B class). Rebase verdicts:
+  - dense GEMM: REBASE (upstream sm75 Marlin static since Dec 2025)
+  - MoE GEMM: REBASE and absorb
+  - attention: DIVERGE with the one-constant FlashInfer floor patch,
+    proven one generation up by the weicj fork
+  The FlashInfer sm75 prefill smem hole is one the bridge kernel fills;
+  re-selecting FlashInfer alone does not fix prefill.
+- **MLA models**: de-weighted under the focus; the tuples now ship
+  in other families (Mistral Small 4 is the first 320/256). A cheap
+  triton_mla fp16-KV gate-0 runs when an MLA checkpoint enters the mix.
+- **Both-card target run**: acceptance is floor-anchored per the
+  ratified framing (MEMORY 164290d): no-MTP decode at or near the DRAM
+  floor for our W4A16 config; sinter's recorded tie proves
+  attainability (the effort is paused, a reference baseline, not a
+  second engine); the weicj fork is the normalized peer yardstick (same
+  quant, same speculative depth, restart discipline labeled). KV
+  envelope from the checkpoint geometry: 64 KiB per token fp16;
+  1.1-1.3M tokens at K8V4 on the pair. Preemption rule: V1 is
+  recompute-only, so admission control holds zero preemptions and a
+  PREEMPTED event is a gate failure. The TP2 restart-variance probe
+  gates the committed number.
+- **Family-native speculative decode (new row)**: MTP3-first plus
+  ngram, engine-level, per the corpus (upstream-measured acceptance
+  0.75-0.90 on the 27B; the only Turing datapoint is weicj's 1.39x with
+  decay 87/68/51 percent across depths). Fork gates: q_len=K+1 decode
+  attention (the bridge kernels are q=1 instantiations) and GDN
+  recurrent-state rollback on rejection; compressed-KV arms require the
+  #53180 degenerate-loop canary on real prompts.
+
 ## Hardware-fact sheet (why Turing is good at this)
 
 - E4M3 in FP16: lossless (subset); rebias = +8 to the exponent field.
@@ -153,3 +214,8 @@ every other row is unreachable on current upstream.
    delegation unchanged when no adapter matches.
 4. A written "incoming format" checklist so the next format is an
    adapter + a row.
+5. The both-card number is committed against the floor-anchored minimum
+   (the DRAM floor for our W4A16 config; with MTP, the floor times the
+   measured acceptance band), with the peer yardstick cited under the
+   normalization rule; the restart-variance and MTP engine probes land
+   before the committed run.
