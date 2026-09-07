@@ -197,6 +197,13 @@ below seeded (0.79-0.89 across two runs) and tp1 decode sits at the
 campaign (tile-skip and ldmatrix are fenced out as causes for decode;
 the residual suspect is the per-tile barrier/staging pattern under TP2
 lockstep). Per gate 0 discipline the campaign is recorded RED with the
-bisect plan rather than rerun-lottoed green: next campaign bisects the
-d128 decode regression under TP2 lockstep or ships a decode-selective
-variant. The d=256 objective itself is unaffected and delivered.
+bisect plan rather than rerun-lottoed green. RESOLVED (2026-09-07): the
+apparent stale-vs-tuned comparison was confounded - the restored csrc
+copies were dead files (the shim includes the canonical lane header by
+relative path), so both runs measured the TUNED kernel. The tp2 bridge
+decode rows swing 12.4-16.4 tok/s between engine restarts of the same
+kernel; the kernel-isolated A/B exonerates the kernel (stale 2523 us vs
+tuned 2324/2176 us per launch - the tuned kernel is the faster one).
+Verdict: variance, not regression. Methodology fix recorded: tp2 decode
+rows are judged on medians across at least three engine restarts. The
+d=256 objective is unaffected and delivered.
