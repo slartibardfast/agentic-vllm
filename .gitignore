@@ -17,3 +17,7 @@
 
 # The local environment fingerprint: this machine's state, never shared.
 /.claude/skills/*
+
+# session-scope tool state (weco optimizer stores, ZCode plan-mode files)
+.weco/
+.zcode/

@@ -11,7 +11,7 @@ the frontier.
 ## Design inputs (from the 2026-09-06 deep-research run)
 
 Full evidence: research/headshape/report.md. Verdicts carried forward:
-the frontier full-attention head dim is 256 (Qwen3-Next through 3.8,
+the frontier full-attention head dim is 256 (Qwen3-Next through Qwen3.8,
 Gemma-2/3; Gemma-4 adds heterogeneous 512 globals) - D={64,128} was an
 overfit; coverage-set policy for this plan: **dispatch extension is a new
 template instantiation, never a redesign**, and every claimed dim rides
@@ -48,7 +48,7 @@ bridge stack presents silently wrong: the kernel rides the fp64 oracle
 compares against raw-tensor references, the engine gate runs identity
 and PPL checks, and the macro gate consumes only gate-passing arms.
 
-## Step 0 - same-hardware baselines (route C)
+## Same-hardware baselines (route C)
 
 1. FlashInfer 0.6.18 (installed in the lane venv): verify the d=256
    smem-accounting fix era, then correctness-check vs torch and measure
@@ -61,7 +61,7 @@ and PPL checks, and the macro gate consumes only gate-passing arms.
 
 All baseline numbers: gpu-lease, median-of-3, recorded in this README.
 
-## Step 1 - route B: k-chunked d=256 in flash_fwd_sm75.cuh
+## Route B: k-chunked d=256 in flash_fwd_sm75.cuh
 
 D=256 template: S = QK^T and PV each chain two 128-deep m16n8k8
 sequences with fp32 accumulation across chunks; Q fragments stay in
@@ -71,13 +71,13 @@ first and the llama.cpp fp16-PV-accumulator variant behind a flag only
 if ptxas spills. Softcap hook added (Gemma requirement). Oracle extended
 to d=256 (causal/full/GQA + magnitude regressions) before any timing.
 
-## Step 2 - integration and acceptance
+## Integration and acceptance
 
 bridge_attn.py scope {64,128,256}; d=256 backend tests; engine gate:
 Qwen3.6-27B-AutoRound with full-attention layers on BRIDGE, identity/PPL
 per the plan/0006 protocol; macro gate green at campaign end.
 
-## Step 3 - design notes only
+## Design notes only (no build)
 
 d=512 as a chunk-count change; MLA tuples (576/512, 320/256) reachable
 by the same structure; GDN linear side recorded as FLA-Triton-served
@@ -88,7 +88,7 @@ work, d=512 implementation.
 
 ## Execution record (2026-09-06)
 
-### Step 0.1 - FlashInfer d=256 baseline
+### FlashInfer d=256 baseline
 
 Decode (BatchDecodeWithPagedKVCacheWrapper, GQA 24/4, d=256): CORRECT,
 max_err 0.00011-0.00049 across uniform/mixed/long kv batches. Baseline tg
@@ -98,7 +98,7 @@ wrong in every probed configuration (MHA/GQA x causal/non-causal,
 d=128/256, ctx 8-2048; max_err up to 4.24 vs two agreeing references).
 Recorded in flashinfer-sm75-validation.md; harness fi_d256_baseline.py.
 
-### Step 0.2 - FA2-native probe
+### FA2-native probe
 
 The quilt's raw binding (flash_attn_2_cuda.fwd) reaches FA2's own
 sub-sm80 kernels on this card. d=256 fp16 causal: LAUNCH FAILURE
@@ -108,9 +108,9 @@ WRONG - gate 0 max_err 2.20 vs agreeing torch references, wrong in every
 64-row block and every head, its own softmax_lse off by 1.14; scale
 conventions ruled out; the defect is in the sub-sm80 score computation.
 DISQUALIFIED by gate 0. No FA2 or FlashInfer prefill baseline exists on
-sm_75; FlashInfer decode stands as the only third-party baseline.
+sm_75; FlashInfer decode is the only third-party baseline that remains.
 
-### Step 1 - k-chunked d=256 in the bridge kernel (landed)
+### K-chunked d=256 in the bridge kernel (landed)
 
 D=256 template: 32-row KV tiles single-buffered, Q fragments loaded
 straight from gmem (no sQ), S and PV chained per 32-row tile, causal
@@ -121,7 +121,7 @@ profile identical to d=64/128. Bench (medians, 1455 MHz, exclusive):
 d=256 s=2048 22.0 TFLOP/s, s=8192 24.3 TFLOP/s - on par per-FLOP with
 d=128 (21.2/23.6), no cliff. First silicon, no spills.
 
-### Step 2 - integration
+### Integration
 
 bridge_attn.py scope {64,128,256}; the route predicate in
 flash_attn_interface.py accepts 256; bridge_shim.cu carries the 256
@@ -134,7 +134,7 @@ shim now includes the canonical turing_lab/bridge header by relative
 path and the stale copies are deleted (drift impossible). 27B engine
 gate: recorded below when the run lands.
 
-### Step 3 - design notes
+### Design notes
 
 - d=512: a chunk-count change on the same structure (4 x 128 chains);
   smem stays at the 32-row KV tile size. Only worth instantiating when a
@@ -149,7 +149,7 @@ gate: recorded below when the run lands.
   FMA-bound - an sm_75 GDN microbench is its own future item, not built
   here.
 
-### Step 2 acceptance (2026-09-06 evening)
+### Integration acceptance (2026-09-06 evening)
 
 27B engine gate (Qwen3.6-27B-AutoRound, TP=2, MML 40960, exclusive
 lease): ALL 14 GATES PASS. PPL 2k = 6.7761 (plan/0006 record 6.7763,
@@ -167,7 +167,7 @@ Campaign-end macro gate: run recorded below with the final numbers.
 ### Campaign-end macro gate (2026-09-06 night)
 
 RED by the letter (5 fails), GREEN by diagnosis - the record is in
-vllm-macro-gate-campaign-d256.md. Control arm perfect (0.97-1.02 across
+macro-gate-campaign.md. Control arm perfect (0.97-1.02 across
 all 14 rows). Bridge prefill through the engine is UP everywhere - tp1
 1.05x/1.18x at 512/2048, tp2 0.98x/2.21x at 2048 - because the drift fix
 put the tuned kernel into the engine path for the first time (the seeded

@@ -16,3 +16,6 @@ applied = PIN-two-surfaces-two-claims recorded=2026-08-27 via=verify
     evidence = stamp migrated to baseline e4ed590; six ledger entries applied and recorded
     tool = host-lifecycle@0.50.0
     recorded = 2026-08-27
+applied = LEM-pronoun-system recorded=2026-09-07 via=verify
+applied = REFS-a-foreign-citation-names-its-repository recorded=2026-09-07 via=verify
+applied = ACTIVE-corpus-and-agents-manual recorded=2026-09-07 via=verify

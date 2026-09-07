@@ -9,7 +9,7 @@ generative layers were pulled forward from plan/0004 into this milestone.
 ## What was built
 
 1. **Candidate space** (`search/turing_search.cu`, `variants.def`):
-   three strategies x tiles, runtime split-K —
+   three strategies x tiles, runtime split-K:
    - `staged`: weights dequantized in shared memory (the only
      zero-point-capable strategy; the reference contract);
    - `regdequant`: packed words staged raw, dequant in registers via
@@ -20,7 +20,7 @@ generative layers were pulled forward from plan/0004 into this milestone.
    The variant table lives in `variants.def`, generated and rewritten by
    the proposal layer; the dispatch is by strategy token-paste, so row
    order can never desynchronize strategy selection.
-2. **Analytic pre-filter** (`space.py`): the documented model, enforced —
+2. **Analytic pre-filter** (`space.py`): the documented model, enforced:
    shared-memory budget, the >=2-resident-blocks occupancy rule,
    roofline prediction with wave quantization.
 3. **Measurement harness** (`harness.py`): CUDA-event medians, per-shape
@@ -36,7 +36,7 @@ generative layers were pulled forward from plan/0004 into this milestone.
    the variant table around the frontier; every proposal rides the same
    gates (legality model -> oracle -> timing -> winner margin). The
    checked-in table grew 20 -> 22 rows this way. This is the hook a
-   future LLM-in-the-loop proposer plugs into — any source of legal rows
+   future LLM-in-the-loop proposer plugs into: any source of legal rows
    rides the identical gates.
 6. **Transports and multi-GPU** (`mgpu.cu`, `transport.py`): all three
    modes measured (results below); N-sharded and K-sharded strategies
@@ -44,8 +44,8 @@ generative layers were pulled forward from plan/0004 into this milestone.
 7. **Dispatch consumption** (`turing_marlin.py`): `DispatchTable`
    loads the emitted artifact and maps runtime M -> (variant, split-K);
    env-gated on `VLLM_TURING_DISPATCH_TABLE`, absent the incumbent
-   delegation is untouched. Selection tests cover the mapping, fallback,
-   and shape-coverage gates.
+   delegation is untouched. Selection tests cover dispatch mapping and fallback
+   behavior, plus the shape-coverage gates.
 
 ## Transport results (this host, two Quadro RTX 6000s)
 
@@ -60,9 +60,9 @@ Measured (`transport-results.json`):
 Multi-GPU strategies at N=K=4096 (staged config, oracle-checked):
 
 - **nshard2** (N split, gather halves): 1.32x at M=64, **1.67x at
-  M=512** — oracle-clean; the viable multi-GPU strategy.
+  M=512**, oracle-clean; the viable multi-GPU strategy.
 - **kshard2** (K split, reduce partials): slower at every M and oracle
-  FAIL — fp16 partial precision. Recorded as precision-limited; needs
+  FAIL (fp16 partial precision). Recorded as precision-limited; needs
   fp32 partial outputs before it can be judged.
 
 ## Verification
@@ -71,7 +71,7 @@ Multi-GPU strategies at N=K=4096 (staged config, oracle-checked):
   (determinism check) at N=K=4096 M=64 against the float64 reference.
 - Full-fidelity ladder run completes; winner gates held the
   first-generation baselines (correct: no new combination beat them
-  beyond noise — consistent with D8's finding that regdequant needs the
+  beyond noise, consistent with D8's finding that regdequant needs the
   repack interleave before it can win).
 - vLLM: 10/10 tests green (4 selection, 2 e2e, 4 dispatch-table).
 
@@ -81,14 +81,14 @@ Multi-GPU strategies at N=K=4096 (staged config, oracle-checked):
   whole slice; corrected to the incumbent's per-chunk partial
   accumulation.
 - `pipe` port originally staged 8 of 16 A halves per segment (4 u32
-  vs the required 8 u32 at 2-element stride) — a +2 k-skew; and lacked
+  vs the required 8 u32 at 2-element stride), a +2 k-skew; and lacked
   guards for tiles where THREADS > 2*min(BM,BN).
 - `variant_launch` mapped strategy by index thresholds, which silently
   misdispatched once the proposal layer reordered the table; replaced by
   strategy token-paste.
 - Driver treated a zero-element ZP tensor as present (data_ptr of an
-  empty tensor is not guaranteed null) — nondeterministic garbage.
-- **"Reference `turing_w4a16_pipe.cu` NaNs at K=4096" — RETRACTED.**
+  empty tensor is not guaranteed null), which produced nondeterministic garbage.
+- **"Reference `turing_w4a16_pipe.cu` NaNs at K=4096": RETRACTED.**
   The NaN was an artifact of the ad-hoc cross-check, which fed a
   1-row scale tensor with G=128 (out-of-bounds group reads). With
   proper (K/G, N) scales the reference is clean at K=4096

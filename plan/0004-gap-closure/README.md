@@ -2,13 +2,13 @@
 
 Plan/0004. The goal this milestone exists to hit: **the emitted dispatch
 table must statistically beat the first-generation winners in at least
-one M regime, with no regime regressing** — measured by the plan/0003
+one M regime, with no regime regressing**, measured by the plan/0003
 harness's own winner gates (`max(5%, 3 sigma)`, oracle-clean,
 clock-attested). Today the gates correctly retain the first-generation
 baselines everywhere; the D8 gap decomposition names exactly what is
 missing.
 
-## Goal 1 — swizzled staging for regdequant (IMPLEMENTED as `regdeq2`)
+## Goal 1: swizzled staging for regdequant (IMPLEMENTED as `regdeq2`)
 
 The incumbent's weight ordering lets the skip-flop dequant run without
 per-fragment byte_perm shuffles. Rather than a host-side repack, the
@@ -22,12 +22,12 @@ the scale smem of regdequant (25.6 KiB at 64x128x64, still >=2 blocks).
 - Accept when regdeq2 beats the staged baseline beyond the gate margin
   in at least one regime (final ladder run decides).
 
-## Goal 2 — deep software pipeline
+## Goal 2: deep software pipeline
 
 Multi-stage overlap per the D8 decomposition: register-resident
 dequantized fragments, staging for chunk k+1 overlapped with compute on
 chunk k, beyond the current 2-stage pipe (which the reference kernel's
-NaN-at-K=4096 defect shows is not yet trustworthy either — root-cause
+NaN-at-K=4096 defect shows is not yet trustworthy either; root-cause
 that defect first, it is the same family).
 
 - RESOLVED before this milestone opened: the "reference pipe NaN at
@@ -36,16 +36,16 @@ that defect first, it is the same family).
   variant to the ladder via `propose.py`'s row interface (strategy
   `pipe3`), gated identically.
 
-## Goal 3 — fp32 split-K partials (unlocks kshard2)
+## Goal 3: fp32 split-K partials (unlocks kshard2)
 
 kshard2 failed its oracle on fp16 partial precision. Add an fp32-partial
 epilogue variant (the split-K machinery already writes fp32 internally;
 the gap is the single-GPU K-shard path returning fp16). Re-measure
-cross-GPU K-shard over the NVLink path (43.7 GB/s) — with 2 GPUs the
+cross-GPU K-shard over the NVLink path (43.7 GB/s): with 2 GPUs the
 compute doubles and the partial transfer for M<=64 is tiny, so small-M
 latency is where this can win.
 
-## Goal 4 — LLM proposer hook
+## Goal 4: LLM proposer hook
 
 `propose.py`'s row interface is the contract: any source of legal rows
 rides the identical gates. Add an optional proposer backend (env-gated
@@ -64,11 +64,11 @@ data, not errors.
   not the selection harness (constant per-launch overhead cancels in
   selection but not in absolute latency claims).
 
-## Acceptance — MET (2026-08-28, run dispatch-table-20260828T121538Z)
+## Acceptance: MET (2026-08-28, run dispatch-table-20260828T121538Z)
 
 1. **The emitted table beats the first-generation baseline beyond the
    gate margin in regime M in [1, 8]: `regdeq_64_128_64_w4x2` with
-   split-K nz=2** — 0.1793 vs 0.2234 ms at M=1 and 0.1834 vs 0.2427 ms
+   split-K nz=2**, 0.1793 vs 0.2234 ms at M=1 and 0.1834 vs 0.2427 ms
    at M=8 (sigma 0.0077), no other regime regressed (baselines retained
    by their own gate transcripts, committed). Note: regime-relative
    timings are harness-internal (constant per-launch overhead included

@@ -11,7 +11,7 @@ rooms map to the five W's.
 | When | `plan/` | the milestone index and folders |
 | Where | `<software>/` | the hosted software, a bare store with worktrees; you add it |
 | Why | `call/` | decisions about the software (MADR; see `call/0000`); methodology lives in the spine, not here |
-| How | `CLAUDE.md` + `tools/` | the verification lanes |
+| How | `AGENTS.md` + `tools/` | the verification lanes |
 
 `tools/` are referenced submodules, each under its own license; we orchestrate
 and wrap, never patch:
@@ -23,7 +23,7 @@ and wrap, never patch:
 
 (`host-grammar`, the shared naming/numbering rules crate, is a build dependency of `host-lint` and `host-lifecycle`, not a host submodule.)
 
-A lane is **mandatory once a spec of its kind exists** (RFC-2119 MUST; see `CLAUDE.md`): a `.allium` requires `tools/allium` + its skills + a `check`/`analyse`/`plan` CI lane with the obligations discharged by tests; a `.tla` requires `tools/specula` + a TLC lane. Adopting a lane is optional; ignoring a present spec's lane is a defect.
+A lane is **mandatory once a spec of its kind exists** (RFC-2119 MUST; see `AGENTS.md`): a `.allium` requires `tools/allium` + its skills + a `check`/`analyse`/`plan` CI lane with the obligations discharged by tests; a `.tla` requires `tools/specula` + a TLC lane. Adopting a lane is optional; ignoring a present spec's lane is a defect.
 
 `.claude/skills/` are symlinks into those submodules' skills (reference, not
 copy). They are **generated, not tracked**: `link-skills.sh` creates a link for each
@@ -35,7 +35,7 @@ adopt, embed, remap, verify, publish, upgrade, release), enumerated once in the
 tool-readable `lifecycle.manifest`; unlike a lane, the lifecycle is driven by the
 tool, and the rule is **every phase emits a receipt** (`done`/`skip`/`n-a` in
 `.host-receipts`), not "every phase runs". A phase with no receipt is a
-`software --check` HAZARD (`CLAUDE.md`).
+`software --check` HAZARD (`AGENTS.md`).
 
 The *Where* room is the software under test, **one or more** components, each
 embedded as a **bare store with worktrees** under `software/<name>/`: the shared
@@ -57,10 +57,10 @@ single submodule tree could not. Software initiated under the methodology has
 **reproducible builds**: the stanza also records the `build`/`toolchain` recipe and
 the deployed `artifact` hash, so `host-lifecycle software --verify-build` can rebuild
 from the pin and prove the deployed binary; migrated software not yet reproducible
-carries a `repro-waiver = call/NNNN` case decision (see `CLAUDE.md`). A component that
+carries a `repro-waiver = call/NNNN` case decision (see `AGENTS.md`). A component that
 ships static or self-contained binaries also records a `deps-bundle = <url> <sha256>`, a
 pinned vendored-dependency bundle it downloads, verifies, and builds offline against under
-`--network none`, so the build is hermetic (see `CLAUDE.md`). A component that
+`--network none`, so the build is hermetic (see `AGENTS.md`). A component that
 ships on several platforms records one `[build "<name>" "<platform>"]` subsection per
 platform (each a distinct toolchain/artifact of the *same* pin, with an `attest-host`
 naming the OS that reproduces it); the flat single-build form stays valid for the
@@ -98,5 +98,5 @@ non-default mount, so a root-published `book.toml` stays byte-identical,
 `book --print-mount` prints the normalized value, and the reference Site workflow
 reads it from the tool to publish under the sub-path with the surrounding site kept.
 
-The methodology lives in `CLAUDE.md`. Read it first. The whole template is
+The methodology lives in `AGENTS.md`. Read it first. The whole template is
 released into the public domain (Unlicense); see `README.md` for provenance.

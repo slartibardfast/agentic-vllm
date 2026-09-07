@@ -99,3 +99,27 @@
     evidence = rename map empty; audit clean with the measured-quantity lexicon entries
     tool = host-lifecycle@0.50.0
     recorded = 2026-08-27
+
+[receipt "embed" "deep-research-skills"]
+    disposition = done
+    evidence = pin 8f87771f recorded in .host-software; worktree materialized at master b375424; research-zcode-en and research-zcode-zh trees installed into ~/.agents/skills/ (discovered at session start)
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-07
+
+[receipt "embed" "weco-skill"]
+    disposition = done
+    evidence = pin 707e1324 recorded in .host-software; worktree materialized at main 707e1324; SKILL.md + references installed into ~/.zcode/skills/weco via weco setup zcode --local
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-07
+
+[receipt "release" "deep-research-skills"]
+    disposition = skip
+    reason = no release artifacts of its own: the lane consumes the fork at a pinned worktree and installs skill files by copy, so no vX.Y.Z tag is cut on this host
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-07
+
+[receipt "release" "weco-skill"]
+    disposition = skip
+    reason = forked-output adoption with no agentic-weco machinery on this host: nothing of its own is released, the pinned worktree anchors what ships
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-07

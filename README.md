@@ -5,7 +5,7 @@ thought about the engine (plans, decisions, personas, specifications) lives in
 this repository, versioned and audited, and the engine itself lives beneath it
 as the Where room, materialized locally from the recipe in `.host-software`.
 
-Read [CLAUDE.md](CLAUDE.md) first. It is the operating manual, and it tells any
+Read [AGENTS.md](AGENTS.md) first. It is the operating manual, and it tells any
 agent exactly how to work here. [STRUCTURE.md](STRUCTURE.md) is the one-page
 map of the rooms:
 

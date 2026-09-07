@@ -19,12 +19,12 @@
 	# every materialized worktree. The artifact hash is the published
 	# linux-amd64 release binary (the host install manifest carries it).
 	url       = https://github.com/connollydavid/host-lint.git
-	pin       = 966259fb2001d0a4f6bdf3ae608ddd1c36c309d0
+	pin       = ff0516ad210323d1d23c2bfbaf2d7c49f1e3a1b1
 	worktrees =
 	toolchain = 1.95.0
 	build     = cargo build --release --locked
 	deploy    = host-lint
-	artifact  = target/release/host-lint 5ea6e94d17e7a860c9809728eee988f23caffe45e2d958628835fd44271ec645
+	artifact  = target/release/host-lint 856f19d7ea22c2d2a275b738cff85e4abb0314936446d4b7ca8344f513ae7f81
 	hooks     = pre-commit
 
 [software "deep-research-skills"]
@@ -44,12 +44,12 @@
 	# The lifecycle binary the phases run through. Recorded so the gate can
 	# verify the local binary against the published release the same way.
 	url       = https://github.com/connollydavid/host-lifecycle.git
-	pin       = 66c24d6de0833b8bafc58c5c875ab23b9303c47a
+	pin       = 1686a6edd071c2e4d6b4ca74141be605f56dc8b5
 	worktrees =
 	toolchain = 1.95.0
 	build     = cargo build --release --locked
 	deploy    = host-lifecycle
-	artifact  = target/release/host-lifecycle bd701a3723211f71787714d32b70c2be2e39a0b1c5ff5c4c4ca44b1baf8192e1
+	artifact  = target/release/host-lifecycle 3b218e7ae89cb8fbb3e11fe246a38730ea17c93651cbb5568daffa75880c8f14
 
 [software "weco-skill"]
 	# The weco optimization-skill lane, adopted forked-output only (no

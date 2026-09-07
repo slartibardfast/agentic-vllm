@@ -21,3 +21,27 @@ MEMORY.md
 
 # Dated measurement artifacts: frozen records of benchmark and oracle runs.
 plan/*/oracle-run-*.md
+.zcode/
+.weco/
+
+# Session-scope tool state: the ZCode harness's plan-mode files and the weco
+# optimizer's run stores. Machine-authored scratch, not this host's content.
+.zcode/
+.weco/
+
+# The closed research campaign that fed plan/0007: outline, authored summary
+# report, and the skill's generated JSON results (data artifacts, rewording
+# them would falsify what the tools produced). Verdicts are recorded in the
+# plan; the campaign is history.
+research/
+
+# Closed milestone bodies: frozen campaign records whose measurement
+# numerals are data, not names. plan/0006 is the delivered record. The open
+# milestones (0002 through 0005, 0007) stay audited; their data phrases are
+# lexicon entries instead, because their READMEs carry the task graph the
+# receipt gate reads.
+plan/0006-cu-sm80-on-sm75/
+
+# Dated measurement report inside an open milestone: record, not live prose.
+# The plan README beside it stays audited.
+plan/0002-turing-marlin-backend/d8-report.md

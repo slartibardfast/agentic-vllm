@@ -1,6 +1,6 @@
 # The lifecycle manifest (plan/0025) — the single tool-readable journal of the
 # agentic-host lifecycle. One [phase "<name>"] stanza per phase, in `order`. This
-# file is the source of truth that the three prose copies (CLAUDE.md / STRUCTURE.md
+# file is the source of truth that the three prose copies (AGENTS.md / STRUCTURE.md
 # / UPGRADING.md) now point at instead of re-typing: the phase order, modality,
 # driving command, skill, and the evidence a `done` receipt must carry all live here.
 #

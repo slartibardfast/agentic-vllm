@@ -17,3 +17,18 @@ research's 107.2 figure
 214.5 TOPS
 203.5 TOPS
 the 101.7 ceiling
+max_err up to 4.24
+11.8 at kv=4096
+max_err 2.20
+off by 1.14
+drift 0.0002
+0.95 line
++0.4 to +1.6 tok/s
+plan/0006 record 6.7763
+5.2 at kv=16384
+kv=16384; 66.2
+err 0.0033
+25.6 KiB
+0.1793 vs 0.2234 ms
+sigma 0.0077
+0.1834 vs 0.2427 ms
