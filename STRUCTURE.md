@@ -12,6 +12,7 @@ rooms map to the five W's.
 | Where | `<software>/` | the hosted software, a bare store with worktrees; you add it |
 | Why | `call/` | decisions about the software (MADR; see `call/0000`); methodology lives in the spine, not here |
 | How | `AGENTS.md` + `tools/` | the verification lanes |
+| What was learned | `research/` | cross-milestone research runs, the record layer (`call/0005`); milestone-scoped research lives inside its `plan/` milestone |
 
 `tools/` are referenced submodules, each under its own license; we orchestrate
 and wrap, never patch:
