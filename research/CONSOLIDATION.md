@@ -55,8 +55,14 @@ decode e2e (honest ceiling); FLA 0.4.2 is the pin (post-NaN-fix).
 **T3 W4A16 kernels and acceptance.** Final truth (correction ledger):
 the incumbent leads at every measured M; the retracted claim that the
 fork wins M 1-32 was wrong (it beat first-gen baselines only). Gap:
-ours 23.50 (opt2, seated baseline) vs incumbent 51-57 at M512; failing
-regime M>=128 only. Attack levers: swizzled regdeq2 staging, repack
+ours 23.50 (opt2, seated baseline: this protocol, median-of-20,
+locked clocks, N=K=4096) vs incumbent 51-57 (kernel-search.md sweep:
+same shape, same median-of-20, same locked clocks - protocols
+comparable; the seated eval independently reproduced the recorded
+opt1 23.49 to within 0.01). Failing regime M>=128 only. Live upstream
+contradiction on record: the Marlin-Turing PR author claims f32
+accumulate halves throughput on Turing; our paper measured it free at
+the 101.7 ceiling - unresolved, flagged uncertain in the corpus. Attack levers: swizzled regdeq2 staging, repack
 interlace, split-K small-M, deeper pipeline; legality = TU102 red-lines.
 weco session staged (.weco/w4a16-mregime + committed baseline record).
 
@@ -96,12 +102,14 @@ clocks): 101.7 fp16-tensor ceiling; INT8 exactly 2x at 203 TOPS; no
 s4 MMA usable for W4A16 (reconciled nuance: plan/0006 found the tiny
 m8n8k32 .s4 accepted by ptxas with unresolved arity - INT activations
 only, irrelevant to W4A16); k8 wall; two-resident-block occupancy law;
-conflicted STS halves; 535 GB/s; M*=47 crossover. Red-lines are gates,
-not knobs.
+conflicted STS halves; 535 GB/s; M*=47 crossover (the paper's own label: a model output
+and initial hypothesis, not a constant). Red-lines are gates, not
+knobs.
 
 **T9 Tooling, methodology, prior art.** weco lane: observe/adopt-only
 discipline, eval seated. Org prior art: sinter (PAUSED - reference
-baseline, its DRAM-floor tie is the attainability proof; roadmap items
+baseline; its DRAM-floor tie proves the floor reachable on this
+SILICON by a llama.cpp megakernel, not yet by our vLLM path; roadmap items
 not dependencies), calx-mill (the performance-model instrument; its
 TU102 adapter's next lane is exactly plan/0002#performance-model),
 gguf-recast (the recast prior art), calx-telltale (provenance-typed
