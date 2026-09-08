@@ -92,7 +92,7 @@ design reference only. Standing quarterly crosspoll audit row recorded.
 
 ## Uncertainty discipline
 
-49 [uncertain] markers across the corpus, all named per item in the
+120 [uncertain] markers across the corpus (verified count), all named per item in the
 JSONs. External numbers stay out of host records until verified
 (TU102 paper rule); the weicj 100+ tok/s figure is best-case,
 unnormalized, peer yardstick only.
