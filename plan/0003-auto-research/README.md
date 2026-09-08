@@ -133,3 +133,11 @@ stack, adopted forked-output only.
 Open gaps, to fix in the weco-cli fork: setup defaults to upstream's
 skill URL (--local is required until then) and emits the non-expanding
 header form instead of the bridge.
+
+## Research inputs (2026-09-08, call/0005 integration pass)
+
+- The proposer row interface connects to the Triton escape matrix
+  (research/CONSOLIDATION.md T10): any Triton-dependent candidate the
+  search emits must state its Triton codegen path on sm_75; the
+  triton-turing fork is the healthy patch, CUDA-native substitution the
+  production answer (lacunae `triton-fma-floor-sm75` item).

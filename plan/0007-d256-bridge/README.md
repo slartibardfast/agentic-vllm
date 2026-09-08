@@ -238,3 +238,12 @@ interaction), not the attention inner loop. Next instrument: nsys/ncu on
 the tp2 decode step, tuned vs stale, both ranks. The macro gate verdict
 stands RED on those two rows until that campaign explains or recovers
 the delta; every other row and deliverable is green.
+
+## Research inputs (2026-09-08, call/0005 integration pass)
+
+- The next campaign (the tp2 engine-level variance investigation named
+  above) is staged turnkey: the Qwen3.5-4B same-dimension fixture, the
+  probe driver, the preflight, and the exact sequence live in
+  turing_lab/thirdparty/NEXT-WINDOW-RUNBOOK.md; the TRITON control's
+  restart-stable signal (n=2, preliminary) and the d256 route root
+  cause are in research/CONSOLIDATION.md T1 and the probe REPORT.

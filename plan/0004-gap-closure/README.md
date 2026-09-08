@@ -86,3 +86,12 @@ data, not errors.
 Ladder caveat recorded: one candidate (regdeq2_64_128_64_w4x1 nz=2)
 scored an oracle zero during rung2 of the run, but passes 3x in
 isolation - a transient, treated fail-safe (culled, not admitted).
+
+## Research inputs (2026-09-08, call/0005 integration pass)
+
+- The kernel-acceptance continuation is staged: the weco eval
+  (turing_lab/results/w4a16-mregime-baseline/, 23/23 oracle-clean,
+  23.50 TFLOP/s at M512) with the corpus attack levers and the
+  corrections ledger note that the incumbent leads at every measured M
+  (the earlier M 1-32 win claim was retracted; see
+  research/CONSOLIDATION.md T3 and the retraction ledger).

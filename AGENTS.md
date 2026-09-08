@@ -31,8 +31,27 @@ Put each kind of file in its room. Do not invent new top-level folders.
 | Where | `<software>/` | the hosted software, a bare store with worktrees; you add it |
 | Why  | `call/` | decisions, in MADR format (see `call/0000`) |
 | How  | `AGENTS.md` + `tools/` | this manual, and the verification tools |
+| What was learned | `research/` | cross-milestone research runs, the record layer (see `call/0005`); milestone-scoped research lives inside its `plan/` milestone |
 
 `STRUCTURE.md` is the short map of the same thing. Read it once.
+
+## Research integration (call/0005)
+
+Research runs are records, and records do not plan. A run that ends
+without an integration pass has not ended:
+
+- Map findings onto the open tasks of the plan READMEs they inform.
+  The task machinery reads READMEs; a finding that lives only in
+  `research/` or `MEMORY.md` is invisible to it.
+- Write corrections back into the records they invalidate. A
+  MEMORY-only correction leaves the corrected record wrong.
+- Update `research/CONSOLIDATION.md`: the material map, the final
+  truth per topic, the retraction ledger, the uncertainty register,
+  the pending-decision table.
+- Verify the run's own numerical summary claims by script before
+  committing them. Fabricated precision is a record defect.
+- `tools/check-research-integration.sh` holds the mechanical minimum
+  (no orphan runs, no unmapped runs) and runs with the verify battery.
 
 ## How you work: four principles
 

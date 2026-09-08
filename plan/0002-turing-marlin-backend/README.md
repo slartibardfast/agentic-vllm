@@ -207,3 +207,15 @@ implementation margin.
 
 - verify: attested operator
 - depends: #runtime-validation, #moe-integration, #config-table
+
+## Research inputs (2026-09-08, call/0005 integration pass)
+
+- The open `performance-model` task has a named instrument: calx-mill
+  (org prior art), whose TU102 adapter's predicted-versus-measured lane
+  is exactly this task. See research/CONSOLIDATION.md topic T9 and the
+  lacunae `w4a16-perf-acceptance` item.
+- The open `marlin-contract` acceptance surfaces live in
+  research/CONSOLIDATION.md topic T3: incumbent 51-57 TFLOP/s at M512
+  (kernel-search.md protocol), our seated 23.50 baseline, the named
+  attack levers, and the red-lines as culling gates
+  (tu102-characterization.md levers section).
