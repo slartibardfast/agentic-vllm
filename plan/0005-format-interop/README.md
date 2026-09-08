@@ -219,3 +219,14 @@ Qwen3.8 + Qwen3.8-Next. Per-stage verdicts; citations live in the corpus:
    measured acceptance band), with the peer yardstick cited under the
    normalization rule; the restart-variance and MTP engine probes land
    before the committed run.
+
+   MET (2026-09-08, first commit of the number): BRIDGE 11.1 tok/s and
+   TRITON 12.7 tok/s ctx512 decode, median of 3 fresh restarts, backend
+   and KV asserted at load, zero preemptions, clocks locked (the
+   committed-both-card record in the lane). Eager-mode labeled; ~0.21
+   of the 55.4 tok/s derived single-stream floor, the gap class named
+   (per-step engine overheads; CUDA graphs the next rung). MTP arm:
+   native mtp K=3 greedy-lossless on both targets, 1.75x ctx512 on the
+   27B - the with-MTP projection ~22 tok/s. The acceptance criterion
+   continues toward the floor itself: the committed number is the
+   first rung, not the last.
