@@ -25,8 +25,9 @@ authoritatively, and what decision it feeds. Chronological sources
 
 **T1 Engine and TP2 serving.** Final truth: the tp2 decode swing
 (12-17 tok/s) was recorded on the 1.5B gate model; on the
-same-dimension 4B hybrid the TRITON control is restart-STABLE
-(0.8-1.2 percent bands); the bridge arm is unmeasured in-engine (the
+same-dimension 4B hybrid the TRITON control shows a restart-stable
+SIGNAL at n=2 restarts (0.8-1.2 percent bands; the methodology floor
+is n>=3, so preliminary, not settled); the bridge arm is unmeasured in-engine (the
 window closed on a CUDA_HOME residual; fix applied, driver turnkey).
 The d256 engine path had broken post-campaign (staged half-revert in
 the vendored FA2 tree + load-bearing kernel API living uncommitted);
@@ -47,7 +48,8 @@ Gemma 4's problem). Register wall live: d256 sits at 255/254 regs.
 Partial RoPE (25 percent) + q/k RMSNorm + swish gate are contract
 items no kernel may fold away. Softcap carried through the shim
 (FA2-tree commit 9eb4012). GDN layers: stock FLA Triton path is the
-only maintained pre-Hopper route; FlashQLA sm75 fork = +0.61 percent
+only maintained route inside the vLLM/FLA ecosystem (llama.cpp-family
+serves GDN on CUDA independently); FlashQLA sm75 fork = +0.61 percent
 decode e2e (honest ceiling); FLA 0.4.2 is the pin (post-NaN-fix).
 
 **T3 W4A16 kernels and acceptance.** Final truth (correction ledger):
@@ -139,7 +141,9 @@ CUDA kernel rebuild (deferred - FLA Triton sufficient for now).
 - The m8n8k32 .s4 arity micro-question (plan/0006; W4A8-IMMA corner).
 - FA2 #55380 merge state; weicj v0.2.x CUDA-graph TP2 reproducibility
   on our pair (their numbers are best-case, no restart discipline).
-- 49 per-item [uncertain] markers live in the lacunae JSONs.
+- 120 per-item [uncertain] markers live in the lacunae JSONs
+  (verified by script; the 49 first written here and in SUMMARY.md
+  was fabricated precision, corrected 2026-09-08).
 
 ## Pending decisions and the evidence each needs
 
@@ -157,6 +161,8 @@ CUDA kernel rebuild (deferred - FLA Triton sufficient for now).
 The variance story exists in five places; authoritative = the probe
 REPORT.md + this file. The architecture facts exist in three; the
 headshape deep-dive JSON is authoritative, the plan/0007 summary
-derivative. MEMORY entries are never authoritative over a committed
-report. Where the lacunae corpus corrected an input, the corpus wins
+derivative. MEMORY entries yield to committed reports EXCEPT dated
+MEMORY corrections, which override the specific entries they
+invalidate (the 2026-08-28 kmap-probe correction versus the committed
+turing_lab/probes record is the standing example). Where the lacunae corpus corrected an input, the corpus wins
 over the outline descriptions.
