@@ -231,12 +231,14 @@ Qwen3.8 + Qwen3.8-Next. Per-stage verdicts; citations live in the corpus:
    continues toward the floor itself: the committed number is the
    first rung, not the last.
 
-   RUNG TWO (2026-09-09, non-eager): TRITON+CUDA-graphs 50.1 tok/s
-   ctx512 decode, band 0.0 percent across 3 restarts, zero preemptions
-   = 0.90 of the derived 55.4 tok/s floor (which does not yet subtract
-   the allreduce share) - the floor-anchored acceptance effectively MET
-   on this backend; the corpus launch-overhead prediction confirmed
-   quantitatively. Bridge+graphs 27.3 with its engine cost isolated
+   RUNG TWO (2026-09-09, non-eager; doctrine 2026-09-09: TRITON is
+   the BASELINE, the bridge is the production target): the TRITON+
+   CUDA-graphs arm reached 50.1 tok/s ctx512 decode, band 0.0 percent
+   across 3 restarts, zero preemptions = 0.90 of the derived 55.4
+   tok/s floor - this is the BASELINE the bridge target must beat, and
+   the proof that the floor is reachable by the stock path under
+   graphs; the corpus launch-overhead prediction confirmed
+   quantitatively. Floor-attainment claims ride the TARGET backend. Bridge+graphs 27.3 with its engine cost isolated
    (~23 tok/s headroom, bands 9-27 percent - the per-request gather
    loop, next campaign's surgical target). MTP x graphs: no compound
    (0.93x/1.11x, lossless) - levers overlap on launch latency; the

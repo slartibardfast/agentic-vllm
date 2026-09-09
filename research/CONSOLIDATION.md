@@ -23,7 +23,7 @@ authoritatively, and what decision it feeds. Chronological sources
 
 ## Topic consolidation
 
-**T1 Engine and TP2 serving.** Final truth: the tp2 decode swing
+**T1 Engine and TP2 serving.** Doctrine (2026-09-09, operator): TRITON_ATTN is the baseline/control arm only; BRIDGE is the production target - floor-attainment and committed-number claims ride the target backend, TRITON numbers are labeled baselines. Final truth: the tp2 decode swing
 (12-17 tok/s) was recorded on the 1.5B gate model; on the
 same-dimension 4B hybrid the TRITON control shows a restart-stable
 SIGNAL at n=2 restarts (0.8-1.2 percent bands; the methodology floor
@@ -157,7 +157,7 @@ CUDA kernel rebuild (deferred - FLA Triton sufficient for now).
 
 | Decision | Blocking evidence |
 |---|---|
-| 27B both-card committed number | probe + 27B bridge verdict (runbook) |
+| bridge decode >= the TRITON baseline under graphs (27.3 vs 50.1) | the paged/varlen decode kernel + gather-loop elimination (plan/0007 next campaign; committed rung-two record) |
 | W2/W3 execution: build vs adopt (Humming) | Humming-on-TU102 gate-0 bench |
 | MXFP4 nibble-LUT build vs skip | NVFP4 gate-0 first (cheaper, same LUT core) |
 | MTP3 session start | variance verdict (schedule) + weco login |
