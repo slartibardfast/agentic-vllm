@@ -230,3 +230,15 @@ Qwen3.8 + Qwen3.8-Next. Per-stage verdicts; citations live in the corpus:
    27B - the with-MTP projection ~22 tok/s. The acceptance criterion
    continues toward the floor itself: the committed number is the
    first rung, not the last.
+
+   RUNG TWO (2026-09-09, non-eager): TRITON+CUDA-graphs 50.1 tok/s
+   ctx512 decode, band 0.0 percent across 3 restarts, zero preemptions
+   = 0.90 of the derived 55.4 tok/s floor (which does not yet subtract
+   the allreduce share) - the floor-anchored acceptance effectively MET
+   on this backend; the corpus launch-overhead prediction confirmed
+   quantitatively. Bridge+graphs 27.3 with its engine cost isolated
+   (~23 tok/s headroom, bands 9-27 percent - the per-request gather
+   loop, next campaign's surgical target). MTP x graphs: no compound
+   (0.93x/1.11x, lossless) - levers overlap on launch latency; the
+   past-the-floor-via-MTP clause awaits a graphs-compatible mechanism
+   (deeper K, acceptance-aware scheduling).
