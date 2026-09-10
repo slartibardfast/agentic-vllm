@@ -239,6 +239,19 @@ the tp2 decode step, tuned vs stale, both ranks. The macro gate verdict
 stands RED on those two rows until that campaign explains or recovers
 the delta; every other row and deliverable is green.
 
+## Next-campaign update (2026-09-10)
+
+The campaign this plan named (the tp2 engine-level decode
+investigation) is ANSWERED across windows 3-4: the gather-count
+thesis refuted (C1, -78.5 pct when batched), the variance isolated to
+the bridge arm's engine interaction, and the paged decode kernel (C2)
+owns short-decode at 6.5x with its long-context collapse isolated to
+the serial page walk. The named successor campaign is the SPLIT-KV
+GRID SURGERY: chunk KV pages across blocks with partial-softmax
+combine, making the paged kernel long-context competitive - the
+bridge arm's path to decode at the floor across all context depths.
+Scorecard: research/CONSOLIDATION.md goal status.
+
 ## Research inputs (2026-09-08, call/0005 integration pass)
 
 - The next campaign (the tp2 engine-level variance investigation named

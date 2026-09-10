@@ -124,6 +124,28 @@ tuples (other families; cheap gate-0 when one enters the mix); d512
 triton-turing fork or CUDA-native substitution, probe designed); GDN
 CUDA kernel rebuild (deferred - FLA Triton sufficient for now).
 
+## Goal status (2026-09-10, post window 4)
+
+The campaign goal, clause by clause: generation on both cards MET
+(re-proven every window); floor reachability PROVEN at 0.90 by the
+stock path, target-backend attainment (bridge) one named surgery away
+(split-KV grid; the paged kernel already owns short-decode at 6.5x);
+attested numerics MET as the deepest asset (the paged kernel proven
+three independent ways: fp64 oracle 18/18, gather loop, upstream
+family 8/8 token-exact); MTP-past-floor PROVEN as physics (2.12x at
+K2, TP2, graphs, on the 4B, lossless) with the 27B gap precisely
+characterized as model-scaled draft economics; median-of-N discipline
+MET as standing law (interleaved A/B harness + champion ledger). The
+headline is two engineering items away: bridge decode at floor across
+contexts (split-KV surgery), and MTP compounding at 27B scale - after
+which the final committed run under the doctrine closes the goal.
+
+No-window mode (operator directive 2026-09-10): CPU-advanceable work
+only - kernel authoring (the split-KV grid: design, code, standalone
+nvcc compile), the paged-MTP q_len guard code, and plan/record work;
+all GPU validation (oracle battery, gate-0, A/B) queues for the next
+window.
+
 ## Corrections and retraction ledger (final)
 
 1. Thinking Machines: atomics are NOT the top inference nondeterminism

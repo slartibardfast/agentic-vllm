@@ -243,4 +243,15 @@ Qwen3.8 + Qwen3.8-Next. Per-stage verdicts; citations live in the corpus:
    loop, next campaign's surgical target). MTP x graphs: no compound
    (0.93x/1.11x, lossless) - levers overlap on launch latency; the
    past-the-floor-via-MTP clause awaits a graphs-compatible mechanism
+   (deeper K, acceptance-aware scheduling). ANSWERED IN PART (2026-09-10
+   windows 3-4): the mechanism compounds where the draft is cheap - 2.12x
+   at K2, TP2, graphs, lossless, on the 4B - and the 27B no-compound is
+   model-scaled draft economics, not topology.
+
+   GOAL STATUS (2026-09-10; the full scorecard lives in
+   research/CONSOLIDATION.md): generation MET, numerics MET, the
+   discipline MET. Remaining for the headline: bridge decode at floor
+   across contexts (the split-KV surgery on the paged kernel, which
+   owns short-decode at 6.5x) and MTP compounding at 27B scale.
+   No-window mode: CPU-side authoring only; GPU validation queues.
    (deeper K, acceptance-aware scheduling).
