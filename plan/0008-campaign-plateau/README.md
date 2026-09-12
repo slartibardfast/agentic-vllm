@@ -136,3 +136,26 @@ task in this sequence carrying its receipt.
 
 - depends: #multirow-paged-rootcause, #k-sweep-champion, #inner-loop, #int8-probe, #campaign-runner, #weco-cli-pr
 - verify: attested operator
+
+## Execution record (2026-09-12/13, in flight)
+
+- #multirow-paged-rootcause DONE (receipted). Mechanism: the glue's
+  `query[:n*qlen].view(n, H, qlen, D)` flat-viewed the engine's
+  token-major verify rows into the kernel's head-major contract —
+  flawless attention on scrambled q for any q_len > 1; invisible at
+  q_len == 1 (all committed numbers), oracle-invisible (the oracle
+  feeds natively-ordered q). Found by instrumenting the live engine
+  (BRIDGE_PAGED_DUAL dual-arm diff, 774 verify steps: deterministic,
+  seq_lens and cache writes clean) plus a one-shot raw-dump
+  brute-force layout matrix. Fixed input-side repack and output-side
+  regroup (lane 734cd84be4); post-fix discriminator greedy 5/5 with
+  max logit diff 0.031 (tie-break class). Record:
+  turing_lab/results/committed-both-card-noneager/MULTIROW-PAGED-ROOT-CAUSE.md.
+- #campaign-runner DONE (receipted). tools/campaign-runner +
+  selftest 6/6 (green+commit, kill-9 resume, hung-eval INFRA,
+  breaker, exit-0 lie, crash retry). Host db19bc0.
+- #weco-cli-pr DONE (receipted). connollydavid/weco-cli#2: --resume,
+  --eval-timeout, harness retry-then-abort, bridge stdin/PATH; 5 new
+  tests, 35 regression-green.
+- #k-sweep-champion RUNNING (K in {1,2} x 3 reps, 27B, graphs,
+  champion path PPS2).
