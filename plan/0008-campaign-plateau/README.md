@@ -113,6 +113,7 @@ the three-part battery: three green steps on a toy eval, a kill mid
 step followed by resume proving reconstruction, and a hung eval hitting
 the timeout and continuing.
 
+- depends: (none)
 - verify: python3 tools/campaign-runner/selftest.py
 
 ### Raise the weco-cli upstream PR {#weco-cli-pr}
