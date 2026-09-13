@@ -110,3 +110,10 @@
     evidence = oracle 36/36 PPS2; gate-0 8/8 zero-diff vs TRITON cross; committed A/B 193.1/41.9/39.8 vs same-day 195.5/41.6/40.2 = NO_DIFF (bands overlap); isolated -16/-9 pct recorded; patch preserved half2-kernel.patch; ledger entry appended; tree reverted to champion; lane c4909f6bf3
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-13
+
+[receipt "plan/0009#mtp-4b"]
+    disposition = done
+    verify = attested operator
+    evidence = K-tree medians-of-3 on the 4B champion path: every depth negative (K2 median 0.44/0.70), greedy 3/3 lossless all reps; summary.json + ledger entry; verdict = compounding does not transfer, family question closed
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13

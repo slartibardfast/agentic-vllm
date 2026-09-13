@@ -198,3 +198,14 @@ closed state, every task in this sequence carrying its receipt.
   patch is preserved at results/short-row-recovery/half2-kernel.patch
   and the working tree reverted to the ledger champion. The ledger
   entry carries the mechanism (sensitivity floor). Lane c4909f6bf3.
+- #mtp-4b DONE (receipted): the family question closed NEGATIVE. The
+  4B fixture on the champion configuration (decode paged-split PPS2,
+  verify/prefill gather, graphs, TP2), K-tree medians over 3 fresh
+  restarts: K1 0.53/0.74, K2 0.44/0.70, K3 0.59/0.73, K4 0.91/0.84
+  (ctx512/ctx2048) - every depth deeply negative, a stronger penalty
+  than the 27B's, greedy 3/3 lossless on every rep. The stock path's
+  compounding does NOT transfer; recorded hypothesis: the champion
+  decode arm is much faster per step on this fixture, so the
+  draft-and-verify overhead prices far higher against it. The 4B
+  deployment shape stays on its measured stock-path numbers. Summary
+  and ledger entry: results/mtp-4b-champion/summary.json.
