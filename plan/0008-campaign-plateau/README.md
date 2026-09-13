@@ -177,3 +177,12 @@ task in this sequence carrying its receipt.
   standalone compile clean, oracle 36/36 at PPS2 (rel 2.54e-04, the
   pre-surgery class); committed-run A/B vs the standing 34.3/34.4/213.5
   in flight.
+- #inner-loop DONE (receipted). Surgery: register-resident accumulators,
+  warp-distributed pairs, warp-uniform softmax, two staging syncs per
+  token, 1 KB smem. Gates: compile clean, oracle 36/36 at PPS2, then
+  committed-run medians-of-3: ctx512 41.3 (band 9.9), ctx2048 41.2
+  (band 0.0), short 195.5 (-8.4 pct, recorded cost). NEW STANDING
+  CHAMPION 41.3/41.2/195.5 — floor 0.75, 0.82 of the TRITON baseline.
+  Mechanism archived: results/inner-loop-surgery/PROFILE-DELTA.md
+  (lanes 11.2->32, smem limit 2->32 CTAs, wall moved to DRAM). Lane
+  92ea74c791 + 53604dc957.
