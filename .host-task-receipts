@@ -117,3 +117,10 @@
     evidence = K-tree medians-of-3 on the 4B champion path: every depth negative (K2 median 0.44/0.70), greedy 3/3 lossless all reps; summary.json + ledger entry; verdict = compounding does not transfer, family question closed
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-13
+
+[receipt "plan/0009#k1-inversion"]
+    disposition = done
+    verify = attested operator
+    evidence = stock-K1 3-rep replication: medians 1.32/1.13 vs champion-K1 banked 1.06/0.87, greedy 3/3 all reps; inversion confirmed; summary.json + ledger entry
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13

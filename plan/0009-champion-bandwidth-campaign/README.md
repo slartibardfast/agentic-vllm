@@ -209,3 +209,13 @@ closed state, every task in this sequence carrying its receipt.
   draft-and-verify overhead prices far higher against it. The 4B
   deployment shape stays on its measured stock-path numbers. Summary
   and ledger entry: results/mtp-4b-champion/summary.json.
+- #k1-inversion DONE (receipted): REAL. The stock-backend K1 control
+  at the standing protocol (3 fresh restarts): speedup medians
+  1.32/1.13 (vals 1.27-1.42/1.08-1.21) vs the champion path's banked
+  1.06/0.87 - the single-rep observation replicates, greedy 3/3
+  throughout. Recorded mechanism (hypothesis, consistent with the 4B
+  K-tree): MTP buys back step overhead the champion path no longer
+  pays while the draft-and-verify machinery prices higher against its
+  faster decode. Spec decode favors the STOCK path at every measured
+  scale; the champion deployment stays no-MTP. Summary:
+  results/k1-inversion/summary.json.
