@@ -32,9 +32,9 @@ no way to catch because no gate reads research material at all.
    - corrections written back into the records they invalidate (a
      MEMORY-only correction is insufficient; the corrected record
      carries the correction or a pointer to it);
-   - `research/CONSOLIDATION.md` updated: material map, final-truth
-     topic entries, retraction ledger, uncertainty register,
-     pending-decision table;
+   - `research/CONSOLIDATION.md` is updated across the material map,
+     the final-truth topic entries, the retraction ledger, the
+     uncertainty register and the pending-decision table;
    - counts and numerical claims in the run's own summary verified by
      script before commit (the 49/120 lesson).
 3. `tools/check-research-integration.sh` enforces the mechanical

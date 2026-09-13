@@ -248,8 +248,9 @@ the bridge arm's engine interaction, and the paged decode kernel (C2)
 owns short-decode at 6.5x with its long-context collapse isolated to
 the serial page walk. The named successor campaign is the SPLIT-KV
 GRID SURGERY: chunk KV pages across blocks with partial-softmax
-combine, making the paged kernel long-context competitive - the
-bridge arm's path to decode at the floor across all context depths.
+combine, which makes the paged kernel long-context competitive; it is
+the bridge arm's path to decode at the floor across all context
+depths.
 Scorecard: research/CONSOLIDATION.md goal status.
 
 ## Research inputs (2026-09-08, call/0005 integration pass)

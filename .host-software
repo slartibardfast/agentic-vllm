@@ -59,6 +59,6 @@
 	# The CLI is NOT a lane: uv tool install from the fork directly,
 	# weco 0.4.0, resolved sha 0111f27e0e370d2ccac4e06e28a6398bda48a95b.
 	url      = https://github.com/connollydavid/weco-skill.git
-	pin      = 707e1324a2923249617256b03f0d9d2bbf17dff3
+	pin      = 32f40b894f21248b332400b39e51eb8625425317
 	worktrees =
-	worktree  = main 707e1324a2923249617256b03f0d9d2bbf17dff3
+	worktree  = main 32f40b894f21248b332400b39e51eb8625425317
