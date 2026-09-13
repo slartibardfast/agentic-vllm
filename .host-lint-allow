@@ -1,0 +1,35 @@
+# Per-project sanctioned vocabulary (measured quantities and test labels
+# that are data, not names). Each entry is the contextual phrase as it
+# appears; measured on a real collision in this host's records.
+
+# plan/0002 seated W4A16 baseline (opt2, M512)
+23.50 baseline
+
+# plan/0005 TRITON+graphs committed run and its derived floor
+50.1 tok/s
+55.4
+# plan/0005 bridge-gather champion datapoint of that window
+27.3
+# plan/0007 C1 batched-gather A/B regression
+78.5 pct
+
+# plan/0008 multi-row root-cause discriminator max logit diff
+0.031
+# plan/0008 ncu profile: lanes active per warp pre-surgery
+11.2 of 32 lanes
+# plan/0008 register-accumulator surgery committed medians and bands
+41.3
+0.0
+0.75
+195.5
+# plan/0008 campaign-runner selftest case labels and fake-harness step ids
+6 cases
+step 0
+t1 pass
+t4 pass
+41.2
+# plan/0005 upstream MTP acceptance band (corpus quantity)
+0.75-0.90
+9.9
+8.4
+0.82

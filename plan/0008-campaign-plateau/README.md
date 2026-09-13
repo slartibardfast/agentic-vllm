@@ -186,3 +186,22 @@ task in this sequence carrying its receipt.
   Mechanism archived: results/inner-loop-surgery/PROFILE-DELTA.md
   (lanes 11.2->32, smem limit 2->32 CTAs, wall moved to DRAM). Lane
   92ea74c791 + 53604dc957.
+- #int8-probe DONE (receipted). Autoround W8A8 quantization of the 4B
+  fixture succeeds (248/347 layers, g128, 3167 s); the engine load
+  fails in the lane's loader (MergedColumnParallelLinear has no
+  orig_layer — the AutoRound int8 method does not cover the model's
+  merged parallel linears). An integration gap, not silicon: the
+  quantized fixture is banked on disk for a window that closes the
+  loader gap. Probe infra notes recorded (backend must be pinned on
+  sm_75; load attempts need a real script with a __main__ guard).
+  Lane results/int8-probe/VERDICT.md, 5f069cfedb.
+- #close-out EXECUTED (2026-09-13). Records current; runbook status
+  set; clocks reset; llama-server restored and health-checked
+  ({"status":"ok"}); lane pushed through bbd7d75702 and the vllm lane
+  pin moved to it. Residual, by design: the weco-skill pin stays at
+  707e132 (its fix commit 90f531c awaits the operator's push to
+  connollydavid — an unpushed sha is never pinned), so the weco-skill
+  DRIFT and the verify recheck it re-opens remain visible until that
+  push lands. The 14 remap tells surfaced by this session's records
+  are dispositioned in .host-lint-allow as measured quantities and
+  test labels.
