@@ -124,3 +124,11 @@
     evidence = stock-K1 3-rep replication: medians 1.32/1.13 vs champion-K1 banked 1.06/0.87, greedy 3/3 all reps; inversion confirmed; summary.json + ledger entry
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-13
+
+[receipt "plan/0009#kv-pipelining"]
+    disposition = done
+    verify = cd software/vllm/sm75-marlin && SPLIT=1 CUDA_HOME=/opt/cuda .venv/bin/python ../../../.weco/c2-paged-decode/oracle.py
+    inputs = software/vllm/sm75-marlin/turing_lab/bridge/bridge_paged_decode_split.cu
+    evidence = oracle 36/36; gate-0 6/8 adjudicated benign (dual-arm, tie-break class); committed A/B 186.7/36.8/39.5 vs 195.5/41.6/40.2 = NEGATIVE (ctx512 -11.5 pct band 0.3); falsified, patch preserved, tree reverted; lane fe14558eeb
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13

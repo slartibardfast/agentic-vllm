@@ -219,3 +219,14 @@ closed state, every task in this sequence carrying its receipt.
   faster decode. Spec decode favors the STOCK path at every measured
   scale; the champion deployment stays no-MTP. Summary:
   results/k1-inversion/summary.json.
+- #kv-pipelining DONE (receipted), falsified NEGATIVE: register
+  prefetch + double-buffered staging + one sync per token. Oracle
+  36/36 at PPS2; gate-0 6/8 adjudicated benign by the dual-arm
+  discriminator (mean worst-row diff 0.004, max 0.0625, the fp16
+  tie-break class; GATE0-ADJUDICATION.md); committed A/B
+  186.7/36.8/39.5 vs the same-day baseline 195.5/41.6/40.2 - ctx512
+  minus 11.5 pct at band 0.3, decisive. Tree reverted, patch
+  preserved (pipelining-kernel.patch). With half2 NO_DIFF and this
+  NEGATIVE, the PROFILE-DELTA lever list is exhausted: the champion
+  41.3/41.2/195.5 class stands as this kernel generation's
+  engine-measured optimum. Lane fe14558eeb.
