@@ -175,3 +175,26 @@ closed state, every task in this sequence carrying its receipt.
   int8 weights, group scales and activation scales as
   compressed-tensors the engine loads natively. Lane 578d06e717;
   the re-export itself is GPU work queued for #int8-headroom.
+- #short-row DONE (receipted), terminal: the recorded cost STANDS. The
+  falsification chain: the champion reproduces same-day (baseline
+  reRun 195.5/41.6/40.2); a same-day A/B with only the walk kernel
+  swapped to the pre-surgery version returns short 216.1 (the
+  pre-surgery class) while mid/long fall to 35.8/35.1 - the kernel
+  commit is the cause, both directions; yet the post-surgery kernel
+  is 3x FASTER isolated at the short shape, so the regression is an
+  engine-context inversion (~3.6 ms per 41 ms step, larger than all
+  16 attention launches combined). The named staging trim (half2,
+  bank-conflict-free, minus 16 pct isolated) produced a committed
+  NO_DIFF - the engine's sensitivity floor sits at multi-ms kernel
+  deltas (the register surgery: ~16 ms/step = +20 pct), so no
+  kernel-internal surgery can close this row. Mechanism open
+  (chrome-trace diff is the named follow-up); evidence in
+  results/short-row-recovery/. Lane c4909f6bf3.
+- #half2-staging DONE (receipted), falsified as an engine mover:
+  oracle 36/36 at PPS2, gate-0 8/8 zero-diff triangulation,
+  committed A/B 193.1/41.9/39.8 vs same-day baseline
+  195.5/41.6/40.2 - every row inside overlapping bands. Isolated
+  wins recorded (minus 16 pct short, minus 9 pct long shapes); the
+  patch is preserved at results/short-row-recovery/half2-kernel.patch
+  and the working tree reverted to the ledger champion. The ledger
+  entry carries the mechanism (sensitivity floor). Lane c4909f6bf3.

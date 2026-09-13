@@ -94,3 +94,19 @@
     evidence = fixture re-examined: BF16 orig_layer wrapper IR, no int8 anywhere; root cause moved export-side; requantize_llmcompressor.sh authored (llm_compressor compressed-tensors format, engine-native, no model patch); py_compile verify green; lane 578d06e717
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-13
+
+[receipt "plan/0009#short-row"]
+    disposition = done
+    verify = cd software/vllm/sm75-marlin && SPLIT=1 CUDA_HOME=/opt/cuda .venv/bin/python ../../../.weco/c2-paged-decode/oracle.py
+    inputs = software/vllm/sm75-marlin/turing_lab/bridge/bridge_paged_decode_split.cu, software/vllm/sm75-marlin/vllm/v1/attention/backends/bridge_attn.py
+    evidence = terminal, cost stands: same-day kernel-swap A/B proves the commit caused it (pre-kernel short 216.1 vs 195.5, mid/long inverted); isolated kernel 3x faster (engine-context inversion, ~3.6ms/step, mechanism open); staging-trim class falsified by the half2 NO_DIFF A/B; PRELIMINARY.md in results/short-row-recovery/
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13
+
+[receipt "plan/0009#half2-staging"]
+    disposition = done
+    verify = cd software/vllm/sm75-marlin && SPLIT=1 CUDA_HOME=/opt/cuda .venv/bin/python ../../../.weco/c2-paged-decode/oracle.py
+    inputs = software/vllm/sm75-marlin/turing_lab/bridge/bridge_paged_decode_split.cu
+    evidence = oracle 36/36 PPS2; gate-0 8/8 zero-diff vs TRITON cross; committed A/B 193.1/41.9/39.8 vs same-day 195.5/41.6/40.2 = NO_DIFF (bands overlap); isolated -16/-9 pct recorded; patch preserved half2-kernel.patch; ledger entry appended; tree reverted to champion; lane c4909f6bf3
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13
