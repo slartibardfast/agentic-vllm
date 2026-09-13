@@ -6,7 +6,7 @@ wholesale from the lane runbook
 which now points at this milestone instead of holding the queue). The
 reason for the move is the research-integration principle applied one
 level down: the task machinery reads plan READMEs, and a work queue
-that lives only in the lane is invisible to it — no receipts, no ready
+that lives only in the lane is invisible to it: no receipts, no ready
 frontier, no input-digest staleness.
 
 The exit contract is the doctrine's (D1 in
@@ -45,10 +45,10 @@ previous window paid for.
 
 The MTP-times-paged failure is narrowed to its traffic class: multi-row
 paged decode, K-independent (red at K=1), oracle-blind (the standalone
-battery is green at every row width — the failure needs the engine's
+battery is green at every row width, so the failure needs the engine's
 cache state), and the draft phase is exonerated. Instrument the paged
-arm under real engine traffic — dump page tables, cache state, and the
-metadata the arm receives at the failing step — until the mechanism is
+arm under real engine traffic: dump page tables, cache state, and the
+metadata the arm receives at the failing step, until the mechanism is
 named, then re-run gate-0 with the paged arm serving MTP verification
 rows. Two acceptable terminal states: the gate passes green (greedy
 match across the battery), or a written mechanism diagnosis with the
@@ -61,9 +61,9 @@ this closes, MTP verification rides the gather arm.
 ### Sweep MTP K on the champion path {#k-sweep-champion}
 
 Measure the draft-token sweep at K in {1, 2} on the champion
-configuration — decode on the paged-split kernel, verify and prefill on
-the gather arm, CUDA graphs on, the 27B checkpoint — completing the K
-tree whose K=3 point is banked in the convergence record. Protocol:
+configuration: decode on the paged-split kernel, verify and prefill on
+the gather arm, CUDA graphs on, the 27B checkpoint. This completes the K tree whose
+K=3 point is banked in the convergence record. Protocol:
 greedy-lossless canaries, medians across three engine restarts, labels
 asserted from engine logs, zero preemptions, the champion ledger
 appended with the intent fields.
@@ -120,7 +120,7 @@ the timeout and continuing.
 
 On the local-only fork, by the fork-branch-and-PR route the login-guard
 bug took: local-mode resume from the step log, an eval timeout knob,
-harness-failure continue-with-retry, and the stdin/PATH bridge fixes —
+harness-failure continue-with-retry, and the stdin/PATH bridge fixes,
 each citing the campaign runner as the local proof of concept. Blocked
 on the runner existing, not on any GPU work.
 
@@ -141,7 +141,7 @@ task in this sequence carrying its receipt.
 
 - #multirow-paged-rootcause DONE (receipted). Mechanism: the glue's
   `query[:n*qlen].view(n, H, qlen, D)` flat-viewed the engine's
-  token-major verify rows into the kernel's head-major contract —
+  token-major verify rows into the kernel's head-major contract:
   flawless attention on scrambled q for any q_len > 1; invisible at
   q_len == 1 (all committed numbers), oracle-invisible (the oracle
   feeds natively-ordered q). Found by instrumenting the live engine
@@ -160,7 +160,7 @@ task in this sequence carrying its receipt.
 - #k-sweep-champion RUNNING (K in {1,2} x 3 reps, 27B, graphs,
   champion path PPS2).
 - #k-sweep-champion DONE (receipted). The 27B champion-path K-tree:
-  K1 1.06x/0.87x, K2 0.86x/0.93x, K3 1.12x/1.07x (banked) — NO
+  K1 1.06x/0.87x, K2 0.86x/0.93x, K3 1.12x/1.07x (banked): NO
   COMPOUND at any K (draft cost scales with the model; the 4B stays
   the MTP-friendly shape). Greedy 4/5 on all six reps adjudicated
   benign via the stock-backend K1 control (also 4/5): MTP-vs-plain-
@@ -169,7 +169,7 @@ task in this sequence carrying its receipt.
   8b26330508). Side observation for next window: stock K1 speedups
   (1.19/1.14) exceeded champion K1's in a single rep.
 - #inner-loop IN PROGRESS: ncu profile of the champion-shape walk
-  kernel names the wall — L1/smem 84 pct, 11.2 of 32 lanes active,
+  kernel names the wall: L1/smem 84 pct, 11.2 of 32 lanes active,
   30 pct barrier stalls, occupancy smem-limited at 2 CTAs/SM, all
   traced to the shared-memory sm_o accumulation and lane-0-serialized
   softmax updates. Surgery: register-resident accumulators,
@@ -182,14 +182,14 @@ task in this sequence carrying its receipt.
   token, 1 KB smem. Gates: compile clean, oracle 36/36 at PPS2, then
   committed-run medians-of-3: ctx512 41.3 (band 9.9), ctx2048 41.2
   (band 0.0), short 195.5 (-8.4 pct, recorded cost). NEW STANDING
-  CHAMPION 41.3/41.2/195.5 — floor 0.75, 0.82 of the TRITON baseline.
+  CHAMPION 41.3/41.2/195.5, floor 0.75, 0.82 of the TRITON baseline.
   Mechanism archived: results/inner-loop-surgery/PROFILE-DELTA.md
   (lanes 11.2->32, smem limit 2->32 CTAs, wall moved to DRAM). Lane
   92ea74c791 + 53604dc957.
 - #int8-probe DONE (receipted). Autoround W8A8 quantization of the 4B
   fixture succeeds (248/347 layers, g128, 3167 s); the engine load
   fails in the lane's loader (MergedColumnParallelLinear has no
-  orig_layer — the AutoRound int8 method does not cover the model's
+  orig_layer: the AutoRound int8 method does not cover the model's
   merged parallel linears). An integration gap, not silicon: the
   quantized fixture is banked on disk for a window that closes the
   loader gap. Probe infra notes recorded (backend must be pinned on
@@ -200,7 +200,7 @@ task in this sequence carrying its receipt.
   ({"status":"ok"}); lane pushed through bbd7d75702 and the vllm lane
   pin moved to it. Residual, by design: the weco-skill pin stays at
   707e132 (its fix commit 90f531c awaits the operator's push to
-  connollydavid — an unpushed sha is never pinned), so the weco-skill
+  connollydavid: an unpushed sha is never pinned), so the weco-skill
   DRIFT and the verify recheck it re-opens remain visible until that
   push lands. The 14 remap tells surfaced by this session's records
   are dispositioned in .host-lint-allow as measured quantities and
