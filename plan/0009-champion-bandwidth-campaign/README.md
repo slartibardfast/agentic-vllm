@@ -26,14 +26,14 @@ request, the host-lint pronoun-role issue), and weco-skill lane
 re-authoring.
 
 Standing numbers this queue works against live in the records, not
-here: the champion line and its baseline ratio in
-`turing_lab/results/ab-champion-ledger.md` (the inner-loop entry),
-the mechanism delta and the named levers in
-`turing_lab/results/inner-loop-surgery/PROFILE-DELTA.md`, the
-committed-run protocol in
-`turing_lab/results/committed-both-card-noneager/COMMITTED-BRIDGE-SPLIT.md`,
-and the int8 verdict in `turing_lab/results/int8-probe/VERDICT.md`
-(paths relative to the `sm75-marlin` worktree).
+in this file: the champion line and its baseline ratio (the
+inner-loop entry of `turing_lab/results/ab-champion-ledger.md`), the
+mechanism delta and the named levers
+(`turing_lab/results/inner-loop-surgery/PROFILE-DELTA.md`), the
+committed-run protocol
+(`turing_lab/results/committed-both-card-noneager/COMMITTED-BRIDGE-SPLIT.md`),
+and the int8 verdict (`turing_lab/results/int8-probe/VERDICT.md`);
+paths relative to the `sm75-marlin` worktree.
 
 ## Build sequence
 
