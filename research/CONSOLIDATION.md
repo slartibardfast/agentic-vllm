@@ -14,7 +14,7 @@ authoritatively, and what decision it feeds. Chronological sources
 | research/headshape/ (10 JSONs) | head-dim landscape, Qwen3.5 architecture, kernel coverage, route choice | complete; consumed by plan/0007 |
 | plan/0006-cu-sm80-on-sm75/research.md | PTX ISA inventory for sm_75 (mma shapes, ldmatrix, cp.async absence) | complete; empirical, this host |
 | plan/0002 tu102-characterization.md | measured silicon envelope + levers/red-lines section | complete; THE silicon authority |
-| plan/0002..0007 READMEs | campaign records (kernels, gates, bisects) | authoritative per plan |
+| plan/0002..0009 READMEs | campaign records (kernels, gates, bisects; 0008 drained and receipted, 0009 the live queue) | authoritative per plan |
 | turing_lab/results/restart-variance-20260907/ | probe harness, REPORT (root cause), provenance patches | complete through window close |
 | turing_lab/results/w4a16-mregime-baseline/ | weco acceptance eval + seated 23.50 baseline | complete, awaiting session |
 | turing_lab/thirdparty/NEXT-WINDOW-RUNBOOK.md | the turnkey window sequence + floor derivation | current |
@@ -27,8 +27,9 @@ authoritatively, and what decision it feeds. Chronological sources
 (12-17 tok/s) was recorded on the 1.5B gate model; on the
 same-dimension 4B hybrid the TRITON control shows a restart-stable
 SIGNAL at n=2 restarts (0.8-1.2 percent bands; the methodology floor
-is n>=3, so preliminary, not settled); the bridge arm is unmeasured in-engine (the
-window closed on a CUDA_HOME residual; fix applied, driver turnkey).
+is n>=3, so preliminary, not settled); the bridge arm is measured
+in-engine and carries the committed champion line (see the goal
+status below; the CUDA_HOME residual was fixed and closed).
 The d256 engine path had broken post-campaign (staged half-revert in
 the vendored FA2 tree + load-bearing kernel API living uncommitted);
 root-caused, restored, kernel edits committed (lane f4b708b122),
@@ -37,8 +38,9 @@ the v0.24.0 drop deliberate (#45375); restore PR #55380 open, tested on
 the Qwen3.8-27B class; FlashInfer sm75 prefill broken on a 64 KiB smem
 overflow (#3620) - the bridge kernel fills that hole. Rebase verdicts:
 dense REBASE, MoE REBASE+absorb, attention DIVERGE (one floor constant,
-weicj-proven one generation up). Feeds: the 27B variance verdict and
-the both-card committed run (runbook).
+weicj-proven one generation up). Feeds: delivered - the variance
+verdict closed by elimination and the both-card committed runs
+banked (runbook records).
 
 **T2 Attention kernels and the bridge.** d=256 delivered and validated
 (plan/0007: oracle, PPL identity 6.7761/6.7763, both ranks); k-chunked
@@ -146,39 +148,47 @@ nvcc compile), the paged-MTP q_len guard code, and plan/record work;
 all GPU validation (oracle battery, gate-0, A/B) queues for the next
 window.
 
-## Goal status FINAL (2026-09-11, 72h window closed)
+## Goal status (2026-09-13, post plateau: plan/0008 drained)
 
 Clause by clause against the campaign goal:
 - Generation on both cards: MET (standing; every committed run label-
   asserted, zero preemptions throughout).
-- At the measured DRAM floor: bridge-split committed 34.3/34.4
-  (floor 0.62; 0.68-0.81 of the TRITON baseline depending on
-  context); the founding variance question CLOSED by elimination
-  (the gather loop was the cause; bands now 1.8-9.0 pct); the
-  stock path's 0.90 stands as the floor-reachability proof.
-  REMAINING: the per-token inner loop (the named residual lever)
-  and the register-dequant W4A16 surgery (days-grade, scoped).
+- At the measured DRAM floor: the plateau closed the named residual.
+  The register-accumulator surgery is the standing champion at
+  41.3/41.2/195.5 (mid/long/short), floor ratio 0.75, 0.82 of the
+  TRITON baseline; the kernel's wall moved to the DRAM path, where
+  attention belongs (mechanism in
+  results/inner-loop-surgery/PROFILE-DELTA.md). The founding
+  variance question stays closed (the gather loop was the cause;
+  committed bands 1.8-9.0 pct); the stock path's 0.90 stands as the
+  floor-reachability proof. REMAINING: the bandwidth-level levers
+  (half2 staging, KV read pipelining) and the recorded short-row
+  cost, all queued in plan/0009; the register-dequant W4A16 surgery
+  stays days-grade, its own future milestone.
 - Attested numerics: MET and deepened (three independent proof
-  families on the paged kernel; the splits-cap silent-coverage bug
-  caught by the purpose-built oracle case; every retraction on
-  record).
-- MTP multiplying past the floor: the mechanism compounds on the
-  champion path (1.12x/1.07x at 27B - PATH-DEPENDENT economics,
-  refining the stock-path no-compound) and is the deployment shape
-  on the 4B (2.12x at K2). The convergence configuration (decode
-  paged-split, verify/prefill gather) is GREEN end to end.
-  REMAINING: the multi-row paged root-cause (narrowed to the
-  traffic class, oracle-blind, K-independent) before MTP rides the
-  paged verify; K1/K2 on the 27B champion path unchecked.
+  families on the paged kernel; the multi-row paged red root-caused
+  to a query-layout view bug in the glue and fixed, its
+  instrumentation retained env-gated; every retraction on record).
+- MTP multiplying past the floor: NO COMPOUND on the 27B at any
+  measured depth (the K tree lives in
+  results/mtp-champion-sweep/summary.json; draft cost scales with
+  the model and eats the acceptance gain). The 4B stays the
+  compounding shape on its measured stock-path numbers; whether
+  that transfers to the 4B champion path is the open family
+  question, queued in plan/0009. The convergence configuration
+  (decode paged-split, verify/prefill gather) is GREEN end to end.
 - Median-of-N discipline: MET as standing law (the champion ledger
   carries every verdict with its evidence).
 
 The falsification ledger earned equal standing: the W4A16 pipeline
 thesis dead with mechanism (smem-bandwidth-bound mma stream); the
 gather-count thesis dead; the tile-shape and unroll maps drawn.
-Next-window queue: multi-row paged root-cause; K1/K2 on the
-champion path; the per-token inner loop; register-dequant+repack
-surgery (dedicated window); INT8 W8A8 probe.
+The plateau queue itself is drained, every task receipted (the
+plan/0008 execution record); its successor is plan/0009, the
+champion bandwidth campaign. INT8: quantization succeeds, the
+engine load is blocked by the lane's merged-linear loader gap, the
+W8A8 fixture is banked, and the loader bridge is a CPU task in
+plan/0009.
 
 ## Corrections and retraction ledger (final)
 
@@ -199,7 +209,9 @@ surgery (dedicated window); INT8 W8A8 probe.
 
 ## Uncertainty register (open, named)
 
-- Bridge arm in-engine variance: unmeasured (next window, first item).
+- Champion-vs-stock K1 speedup ordering: a single-rep inversion in
+  the K-tree sweep (stock exceeded champion); replication queued in
+  plan/0009.
 - Humming-on-TU102 throughput: unpublished anywhere (build-vs-adopt).
 - NVFP4 post-#34577 on real Turing: unverified (gate-0, PPL target).
 - The m8n8k32 .s4 arity micro-question (plan/0006; W4A8-IMMA corner).
@@ -213,10 +225,10 @@ surgery (dedicated window); INT8 W8A8 probe.
 
 | Decision | Blocking evidence |
 |---|---|
-| bridge decode >= the TRITON baseline under graphs (27.3 vs 50.1) | the paged/varlen decode kernel + gather-loop elimination (plan/0007 next campaign; committed rung-two record) |
+| bridge decode >= the TRITON baseline under graphs (41.3/41.2 vs 50.1) | the bandwidth levers queued in plan/0009 (half2 staging, KV read pipelining; PROFILE-DELTA names them) |
 | W2/W3 execution: build vs adopt (Humming) | Humming-on-TU102 gate-0 bench |
 | MXFP4 nibble-LUT build vs skip | NVFP4 gate-0 first (cheaper, same LUT core) |
-| MTP3 session start | variance verdict (schedule) + weco login |
+| MTP on the 4B champion path | the plan/0009 measurement (does the stock-path compounding transfer) |
 | Kernel-lane budget for the 51-57 gap | weco session outcome |
 | Rebase timing onto v0.28-era upstream | #55380 merge or local cherry-pick decision |
 
