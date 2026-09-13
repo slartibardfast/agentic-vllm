@@ -78,3 +78,11 @@
     evidence = close-out executed: records current, runbook status set, clocks reset, llama-server restored healthy, lane pushed bbd7d75702, vllm pin moved, remap phrases dispositioned in .host-lint-allow; residual weco-skill DRIFT documented (operator push)
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-13
+
+[receipt "plan/0009#preflight"]
+    disposition = done
+    verify = cd software/vllm/sm75-marlin && bash turing_lab/thirdparty/preflight_window.sh
+    inputs = software/vllm/sm75-marlin/turing_lab/thirdparty/preflight_window.sh
+    evidence = preflight all-OK at window open 2026-09-13 (CUDA_HOME carried inline on the second pass; first pass failed only that check); llama-server stopped via systemd unit, clocks locked 1455 both cards
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13
