@@ -12,6 +12,7 @@ authoritatively, and what decision it feeds. Chronological sources
 |---|---|---|
 | research/lacunae/ (20 JSONs + SUMMARY.md) | the future-work corpus: engine, kernels, formats, strategy; every claim source-cited | complete, validated 20/20 |
 | research/headshape/ (10 JSONs) | head-dim landscape, Qwen3.5 architecture, kernel coverage, route choice | complete; consumed by plan/0007 |
+| research/longrange-agentic/ (10 JSONs + DOCTRINE.md) | the campaign-runner evidence base and the long-window doctrine (the queue-drain exit contract, failure routing, cadence rules) | complete; the doctrine governs window exits |
 | plan/0006-cu-sm80-on-sm75/research.md | PTX ISA inventory for sm_75 (mma shapes, ldmatrix, cp.async absence) | complete; empirical, this host |
 | plan/0002 tu102-characterization.md | measured silicon envelope + levers/red-lines section | complete; THE silicon authority |
 | plan/0002..0009 READMEs | campaign records (kernels, gates, bisects; 0008 drained and receipted, 0009 the live queue) | authoritative per plan |
