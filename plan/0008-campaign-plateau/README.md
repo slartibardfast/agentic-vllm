@@ -159,3 +159,21 @@ task in this sequence carrying its receipt.
   tests, 35 regression-green.
 - #k-sweep-champion RUNNING (K in {1,2} x 3 reps, 27B, graphs,
   champion path PPS2).
+- #k-sweep-champion DONE (receipted). The 27B champion-path K-tree:
+  K1 1.06x/0.87x, K2 0.86x/0.93x, K3 1.12x/1.07x (banked) — NO
+  COMPOUND at any K (draft cost scales with the model; the 4B stays
+  the MTP-friendly shape). Greedy 4/5 on all six reps adjudicated
+  benign via the stock-backend K1 control (also 4/5): MTP-vs-plain-
+  decode tie-break, not the bridge. Ledger entry + summary.json +
+  adjudicator in turing_lab/results/mtp-champion-sweep/ (lane
+  8b26330508). Side observation for next window: stock K1 speedups
+  (1.19/1.14) exceeded champion K1's in a single rep.
+- #inner-loop IN PROGRESS: ncu profile of the champion-shape walk
+  kernel names the wall — L1/smem 84 pct, 11.2 of 32 lanes active,
+  30 pct barrier stalls, occupancy smem-limited at 2 CTAs/SM, all
+  traced to the shared-memory sm_o accumulation and lane-0-serialized
+  softmax updates. Surgery: register-resident accumulators,
+  warp-distributed pairs, one staging sync pair per token. Gates:
+  standalone compile clean, oracle 36/36 at PPS2 (rel 2.54e-04, the
+  pre-surgery class); committed-run A/B vs the standing 34.3/34.4/213.5
+  in flight.
