@@ -155,3 +155,23 @@ closed state, every task in this sequence carrying its receipt.
 
 - depends: #short-row, #half2-staging, #kv-pipelining, #k1-inversion, #mtp-4b, #int8-headroom
 - verify: attested operator
+
+## Execution record (2026-09-13, in flight)
+
+- #preflight DONE (receipted). Battery all-OK at window open
+  (CUDA_HOME inline on the second pass); llama-server stopped via
+  its unit, clocks locked.
+- #int8-loader DONE (receipted), with its premise corrected by
+  measurement: the banked W8A8 fixture is NOT int8. Its index holds
+  only orig_layer.weight tensors, BF16 in the safetensors headers,
+  with no scales anywhere; autoround 0.15.0's auto_round format
+  exports the triton-act wrapper IR when activation quant is on, and
+  the tuning never left the process. The engine-side orig_layer
+  AttributeError was wrapper naming, not a qwen3_5 loader gap, so no
+  model-file patch was authored (the task's py_compile verify passes
+  unchanged). The fix is export-side:
+  results/int8-probe/requantize_llmcompressor.sh re-runs the
+  fixture-grade recipe with the llm_compressor format, which packs
+  int8 weights, group scales and activation scales as
+  compressed-tensors the engine loads natively. Lane 578d06e717;
+  the re-export itself is GPU work queued for #int8-headroom.

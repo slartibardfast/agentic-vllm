@@ -86,3 +86,11 @@
     evidence = preflight all-OK at window open 2026-09-13 (CUDA_HOME carried inline on the second pass; first pass failed only that check); llama-server stopped via systemd unit, clocks locked 1455 both cards
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-13
+
+[receipt "plan/0009#int8-loader"]
+    disposition = done
+    verify = cd software/vllm/sm75-marlin && .venv/bin/python -m py_compile vllm/model_executor/models/qwen3_5.py
+    inputs = software/vllm/sm75-marlin/vllm/model_executor/models/qwen3_5.py
+    evidence = fixture re-examined: BF16 orig_layer wrapper IR, no int8 anywhere; root cause moved export-side; requantize_llmcompressor.sh authored (llm_compressor compressed-tensors format, engine-native, no model patch); py_compile verify green; lane 578d06e717
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13
