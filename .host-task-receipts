@@ -18,3 +18,63 @@
     evidence = backend registered in the fork, four selection tests plus two e2e lifecycle tests green on TU102
     tool = host-lifecycle@0.50.0
     recorded = 2026-08-28
+
+[receipt "plan/0008#preflight"]
+    disposition = done
+    verify = cd software/vllm/sm75-marlin && bash turing_lab/thirdparty/preflight_window.sh
+    inputs = software/vllm/sm75-marlin/turing_lab/thirdparty/preflight_window.sh
+    digest = 6aefad93f7cac9f09dc0edd02b4f951570dbefd7
+    evidence = preflight all-OK at session open 2026-09-12; transcript in MEMORY 2026-09-12 entry
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-12
+
+[receipt "plan/0008#multirow-paged-rootcause"]
+    disposition = done
+    verify = attested operator
+    evidence = greedy 5/5 discriminator, 774-step dual log, root-cause record in lane results (MULTIROW-PAGED-ROOT-CAUSE.md), lane commit 734cd84be4
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-12
+
+[receipt "plan/0008#campaign-runner"]
+    disposition = done
+    verify = python3 tools/campaign-runner/selftest.py
+    evidence = selftest battery ALL PASS (6 cases: green+commit+ref, kill-9+journal resume, hung-eval INFRA continue, circuit breaker, exit-0 lie, crash retry); tools/campaign-runner/selftest.py
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-12
+
+[receipt "plan/0008#weco-cli-pr"]
+    disposition = done
+    verify = attested operator
+    evidence = connollydavid/weco-cli#2 (fork branch feature/local-campaign-resilience, commits 1bec232+906865e, tests 5/5 + 35 regression)
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-12
+
+[receipt "plan/0008#k-sweep-champion"]
+    disposition = done
+    verify = attested operator
+    inputs = software/vllm/sm75-marlin/turing_lab/results/committed-both-card-noneager/CONVERGENCE-RUN.md
+    evidence = K-tree medians-of-3 in results/mtp-champion-sweep/summary.json; greedy adjudicated via stock-K1 control; champion ledger entry 2026-09-13
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13
+
+[receipt "plan/0008#inner-loop"]
+    disposition = done
+    verify = cd software/vllm/sm75-marlin && SPLIT=1 CUDA_HOME=/opt/cuda .venv/bin/python ../../../.weco/c2-paged-decode/oracle.py
+    inputs = software/vllm/sm75-marlin/turing_lab/bridge/bridge_paged_decode_split.cu
+    evidence = oracle 36/36 at PPS2 after surgery; committed-run medians-of-3 41.3/41.2/195.5 vs champion 34.3/34.4/213.5 (+20 pct mid/long); ledger WIN entry; results/inner-loop-surgery/committed-run.log
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13
+
+[receipt "plan/0008#int8-probe"]
+    disposition = done
+    verify = attested operator
+    evidence = verdict in lane results/int8-probe/VERDICT.md: autoround W8A8 quantizes (248/347 layers), engine load blocked by the merged-linear loader gap (AttributeError orig_layer); lane 5f069cfedb
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13
+
+[receipt "plan/0008#close-out"]
+    disposition = done
+    verify = attested operator
+    evidence = close-out executed: records current, runbook status set, clocks reset, llama-server restored healthy, lane pushed bbd7d75702, vllm pin moved, remap phrases dispositioned in .host-lint-allow; residual weco-skill DRIFT documented (operator push)
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-13
