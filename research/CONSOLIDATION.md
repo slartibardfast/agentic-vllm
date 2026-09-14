@@ -77,7 +77,10 @@ activation space is the real, runtime risk). MXFP4 Marlin is closed to
 Turing on principle (bf16 activations) - the CUDA nibble-LUT is the only
 tensor-core vehicle. NVFP4 floors at 75, post-#34577 Turing status
 unverified (gate-0 probe, falsifiable PPL target). INT8 W8A8 is native
-and unused (203 TOPS measured; the only unexploited tensor rate).
+and unused (203 TOPS measured) - MEASURED AND CLOSED 2026-09-14
+(plan/0009): the compressed-tensors W8A8 chain works end to end and
+the identical-rows A/B lands 0.79-0.85 of the W4A16 incumbent; decode
+is weight-bandwidth-bound and W8 doubles the weight bytes.
 Landmine: #48905 (W4A8 negative-group-scale corruption).
 
 **T5 Speculative decode.** MTP is family-native (Qwen3.8-27B recipe
@@ -191,6 +194,25 @@ engine load is blocked by the lane's merged-linear loader gap, the
 W8A8 fixture is banked, and the loader bridge is a CPU task in
 plan/0009.
 
+## Goal status (2026-09-14, post plan/0009: the queue drained)
+
+The 0009 window closed every task with receipts. The standing
+position: the champion 41.3/41.2/195.5 class is now the MEASURED
+OPTIMUM of this kernel generation on this silicon - both named
+bandwidth levers falsified at the committed protocol (half2 NO_DIFF
+in-engine despite isolated wins; KV pipelining NEGATIVE at ctx512),
+and the short-row cost stands as an engine-context inversion whose
+mechanism is open (the named follow-up is a chrome-trace step diff).
+MTP is dead on the champion path at family scale: the 27B K-tree
+non-compounding, the 4B K-tree all-negative (0.44-0.91), and the K1
+ordering inversion is real (stock 1.32/1.13 vs champion 1.06/0.87) -
+spec decode favors the stock path everywhere on this engine. INT8 is
+a measured closed lane (no headroom, W8 weight bytes lose to W4).
+What remains live for a future window: the engine-inversion
+mechanism (chrome-trace diff), the days-grade register-dequant+repack
+W4A16 surgery (its own milestone), and the 4B deployment shape on
+its stock-path MTP numbers.
+
 ## Corrections and retraction ledger (final)
 
 1. Thinking Machines: atomics are NOT the top inference nondeterminism
@@ -210,6 +232,11 @@ plan/0009.
 
 ## Uncertainty register (open, named)
 
+- Engine-context inversion (the short-row regression): the
+  register-accumulator kernel is 3x faster isolated yet the engine
+  step is ~3.6 ms slower at the short row; mechanism open (graph
+  scheduling, NCCL overlap, or launch interaction); follow-up is a
+  chrome-trace per-kernel step diff in eager mode.
 - Champion-vs-stock K1 speedup ordering: a single-rep inversion in
   the K-tree sweep (stock exceeded champion); replication queued in
   plan/0009.
@@ -226,7 +253,7 @@ plan/0009.
 
 | Decision | Blocking evidence |
 |---|---|
-| bridge decode >= the TRITON baseline under graphs (41.3/41.2 vs 50.1) | the bandwidth levers queued in plan/0009 (half2 staging, KV read pipelining; PROFILE-DELTA names them) |
+| bridge decode >= the TRITON baseline under graphs (41.3/41.2 vs 50.1) | LEVERS EXHAUSTED at this kernel generation (half2 NO_DIFF, pipelining NEGATIVE); next rung is a new generation (the engine-inversion mechanism, or the W4A16 surgery's kernel) |
 | W2/W3 execution: build vs adopt (Humming) | Humming-on-TU102 gate-0 bench |
 | MXFP4 nibble-LUT build vs skip | NVFP4 gate-0 first (cheaper, same LUT core) |
 | MTP on the 4B champion path | the plan/0009 measurement (does the stock-path compounding transfer) |
