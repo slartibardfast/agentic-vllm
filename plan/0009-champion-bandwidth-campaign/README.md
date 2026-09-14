@@ -228,8 +228,8 @@ closed state, every task in this sequence carrying its receipt.
   minus 11.5 pct at band 0.3, decisive. Tree reverted, patch
   preserved (pipelining-kernel.patch). With half2 NO_DIFF and this
   NEGATIVE, the PROFILE-DELTA lever list is exhausted: the champion
-  41.3/41.2/195.5 class stands as this kernel generation's
-  engine-measured optimum. Lane fe14558eeb.
+  41.3/41.2/195.5 class is this kernel generation's engine-measured
+  optimum. Lane fe14558eeb.
 - #int8-headroom DONE (receipted): NO HEADROOM, lane closed. The
   re-export (llm_compressor, per-channel sym dynamic W8A8 after the
   format check rejected grouped g128) produced a real
