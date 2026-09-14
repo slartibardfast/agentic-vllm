@@ -139,3 +139,10 @@
     evidence = chain closed end-to-end: llm_compressor export loads natively on the champion config; 3-restart identical-rows A/B: W8A8 0.79/0.85/0.85 of W4A16 - no headroom, lane closed negative; headroom-summary.json; lane a4310546ba
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-14
+
+[receipt "plan/0009#close-out"]
+    disposition = done
+    verify = attested operator
+    evidence = close-out executed 2026-09-14: records and ledger current (entries for every verdict), runbook status set to drained-9/9, clocks reset, llama-server restored healthy ({"status":"ok"}), lane pushed bc075917f4 with the host pin moved (f9d877a), window data phrases dispositioned in .host-lint-allow (3316a0a), consolidation refreshed (d421b0f), prose clean
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-14
