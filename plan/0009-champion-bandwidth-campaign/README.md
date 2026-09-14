@@ -230,3 +230,15 @@ closed state, every task in this sequence carrying its receipt.
   NEGATIVE, the PROFILE-DELTA lever list is exhausted: the champion
   41.3/41.2/195.5 class stands as this kernel generation's
   engine-measured optimum. Lane fe14558eeb.
+- #int8-headroom DONE (receipted): NO HEADROOM, lane closed. The
+  re-export (llm_compressor, per-channel sym dynamic W8A8 after the
+  format check rejected grouped g128) produced a real
+  compressed-tensors checkpoint (int8 weights, fp16 channel scales,
+  dynamic token activations) and the engine LOADS IT NATIVELY on the
+  champion configuration - the 0008 loader gap closed end to end, no
+  model patch. Identical rows, 3 fresh restarts per arm: short
+  426.9 vs 538.1 (ratio 0.79), ctx512 80.2 vs 94.0 (0.85), ctx2048
+  75.9 vs 89.2 (0.85). Decode is weight-bandwidth-bound; W8 doubles
+  the weight bytes and the int8 tensor rate cannot buy them back at
+  decode shapes. The formats doctrine's last unexplored lane on this
+  silicon is measured and closed; W4A16 stands. Lane a4310546ba.
