@@ -112,3 +112,18 @@ then host pushed, every task receipted.
   split-count sizing rule for capture time; TU102 is 72 SMs; no
   cc 7.5-capable SoTA in the Mar-Sep 2026 delta; FlashInfer sm_75
   restore one PR away (#55380).
+
+## Goal structure (2026-09-15, operator directive)
+
+The operator set the campaign goal: pursue BOTH fronts in order -
+decode parity first, then the W4A16 GEMM surgery - and every verdict
+is a FULLY WORKED PAIRED A/B: both arms measured fresh same-day
+(never a new arm against a banked number), the committed medians
+protocol for anything that survives gate-1. Gate-1 is a KILLING gate
+only: it falsifies fast; nothing is crowned without the committed
+protocol (the asymmetry the sensitivity floor demands). The NCCL
+dispatch read closed the collective question at window open: vLLM's
+custom one-shot allreduce is dispatching (FlashInfer AR refuses
+world_size 2; symm-mem refuses cc 7.5; NVLS unavailable) - the AR
+lever stays below the floor, subject to the profile ledger's time
+share.
