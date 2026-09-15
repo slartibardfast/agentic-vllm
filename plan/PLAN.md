@@ -14,3 +14,4 @@ sort key; see `call/0000`). A milestone is a thin, persona-serving increment.
 - [0008 campaign plateau](0008-campaign-plateau/README.md)
 - [0009 champion bandwidth campaign](0009-champion-bandwidth-campaign/README.md)
 - [0010 last fifth](0010-last-fifth/README.md)
+- [0011 w4a16 register dequant](0011-w4a16-register-dequant/README.md)
