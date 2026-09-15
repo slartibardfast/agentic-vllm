@@ -13,6 +13,7 @@ authoritatively, and what decision it feeds. Chronological sources
 | research/lacunae/ (20 JSONs + SUMMARY.md) | the future-work corpus: engine, kernels, formats, strategy; every claim source-cited | complete, validated 20/20 |
 | research/headshape/ (10 JSONs) | head-dim landscape, Qwen3.5 architecture, kernel coverage, route choice | complete; consumed by plan/0007 |
 | research/longrange-agentic/ (10 JSONs + DOCTRINE.md) | the campaign-runner evidence base and the long-window doctrine (the queue-drain exit contract, failure routing, cadence rules) | complete; the doctrine governs window exits |
+| research/decode-step-scheduling/ (9 JSONs) | the last-fifth corpus: step-roofline method, fused reduction mechanisms, graph concurrency, GDN step coupling, split sizing, NCCL share, the Sep-2026 SoTA delta, the TRITON baseline source read | complete, validated 9/9; feeds plan/0010 |
 | plan/0006-cu-sm80-on-sm75/research.md | PTX ISA inventory for sm_75 (mma shapes, ldmatrix, cp.async absence) | complete; empirical, this host |
 | plan/0002 tu102-characterization.md | measured silicon envelope + levers/red-lines section | complete; THE silicon authority |
 | plan/0002..0009 READMEs | campaign records (kernels, gates, bisects; 0008 drained and receipted, 0009 the live queue) | authoritative per plan |
@@ -212,6 +213,46 @@ What remains live for a future window: the engine-inversion
 mechanism (chrome-trace diff), the days-grade register-dequant+repack
 W4A16 surgery (its own milestone), and the 4B deployment shape on
 its stock-path MTP numbers.
+
+## The last fifth (2026-09-15, plan/0010 corpus complete)
+
+The decode-step-scheduling corpus (9/9 validated, dated sources)
+settled the frame for closing the ctx512 gap (41.3 vs the TRITON
+50.1; at ctx2048 the champion already beats TRITON by 2x). The
+roofline decomposition: the step floor is 18.0-18.3 ms (weights
+17.70 + KV 0.12 + activations 0.01 + allreduce 0.19-0.45 one-shot),
+the TRITON arm sits ~1.7-2.0 ms above it, the champion ~6.2 ms - and
+the residual cannot be byte volume, so it lives in the latency regime
+and step structure: ~539 us/layer of excess across the 8 full-attn
+layers, predictable from Little's law (a 0.17-wave grid cannot keep
+the ~321 KB in-flight the wall demands) and checkable per-kernel with
+the NCU SOL stall-reason workflow. The corpus converges on ONE
+arbitration: plan/0010's #step-profile ledger decides
+dependency-chain excess (fused single-launch walk+combine wins: the
+last-CTA combine via global counters or the CUTLASS split-K
+semaphore; FlashDecoding++ unified-max deletes the combine dependency
+arithmetically), SM-idle (graph fork/join wins, DBO-shaped), or
+collective fallback (NCCL ring at ~6 us/call vs the one-shot ~2.4 us;
+the P2P ld/st one-shot is the only portable design on a 2x Quadro
+NVLink bridge - every NVSwitch path is blocked). Named transplant
+with primary-source backing: flash-attention's split-count sizing
+rule (flash_api.cpp, 1 split if CTAs >= 0.8x SMs, else wave
+-efficiency >= 0.85) at capture time; the winning TRITON baseline is
+itself shape-static split-KV with an L2-resident persistent
+workspace, and pays the same second launch - so structure alone is
+not the tax, the regime is. GDN: two kernels per layer (conv1d +
+FLA packed-recurrent, sm_75-clean); upstream's fused CUDA needs
+cc >= 8; a Triton fusion clears the floor only if the profile prices
+GDN non-GEMM above ~1 ms/step. No published GDN x GEMM overlap work
+exists (negative finding). The Mar-Sep 2026 upstream delta has NO new
+cc 7.5-capable decode SoTA (the megakernel/DeepGEMM/FlashMLA/TRT-LLM
+lines are SM90+); the sm_75 FlashInfer restore is one open PR away
+(#55380; d256 smem fix shipped in v0.6.16); upstream's fused
+Qwen3.5-GDN MTP kernel (v0.28.0 #51674, cc >= 8) explains the
+measured stock-K1 inversion. Correction carried: TU102 has 72 SMs
+(not 84). The gate-1 cull discipline (one engine start, ~10 min per
+option, survivors only reach the committed protocol) is the operator
+-directed process rule for all of it.
 
 ## Corrections and retraction ledger (final)
 

@@ -94,3 +94,21 @@ then host pushed, every task receipted.
 
 - depends: #surgeries
 - verify: attested operator
+
+## Execution record (2026-09-15)
+
+- #corpus DONE (receipted): 9/9 items validated at full field
+  coverage, dated sources, integrated into CONSOLIDATION (the
+  last-fifth section). The corpus converges on one arbitration for
+  the surgeries task: the step-profile ledger decides
+  dependency-chain (fused walk+combine wins: last-CTA combine,
+  CUTLASS-semaphore, or FlashDecoding++ unified-max) vs SM-idle
+  (graph fork/join, DBO-shaped) vs collective fallback (NCCL ring
+  vs one-shot; only P2P ld/st is portable on the NVLink bridge).
+  The roofline headline: step floor 18.0-18.3 ms; TRITON ~2 ms
+  above it; the champion ~6.2 ms; the residual cannot be byte
+  volume - it is latency regime and step structure, ~539 us/layer
+  of excess across the 8 full-attn layers. Also banked: the FA
+  split-count sizing rule for capture time; TU102 is 72 SMs; no
+  cc 7.5-capable SoTA in the Mar-Sep 2026 delta; FlashInfer sm_75
+  restore one PR away (#55380).

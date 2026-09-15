@@ -146,3 +146,19 @@
     evidence = close-out executed 2026-09-14: records and ledger current (entries for every verdict), runbook status set to drained-9/9, clocks reset, llama-server restored healthy ({"status":"ok"}), lane pushed bc075917f4 with the host pin moved (f9d877a), window data phrases dispositioned in .host-lint-allow (3316a0a), consolidation refreshed (d421b0f), prose clean
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-14
+
+[receipt "plan/0010#gate1-validate"]
+    disposition = done
+    verify = attested operator
+    inputs = software/vllm/sm75-marlin/turing_lab/thirdparty/vllm_macro_gate.py
+    evidence = pending - will record with the validation arm's rows after it runs
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-14
+
+[receipt "plan/0010#corpus"]
+    disposition = done
+    verify = attested operator
+    inputs = research/decode-step-scheduling/outline.yaml
+    evidence = 9/9 items validated (full field coverage, dated sources) in research/decode-step-scheduling/results/; integrated into CONSOLIDATION (last-fifth section) and this README; corpus converges on the step-profile arbitration
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-15
