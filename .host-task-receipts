@@ -162,3 +162,11 @@
     evidence = 9/9 items validated (full field coverage, dated sources) in research/decode-step-scheduling/results/; integrated into CONSOLIDATION (last-fifth section) and this README; corpus converges on the step-profile arbitration
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-15
+
+[receipt "plan/0010#gate1-validate"]
+    disposition = done
+    verify = attested operator
+    inputs = software/vllm/sm75-marlin/turing_lab/thirdparty/vllm_macro_gate.py
+    evidence = corrected split-env arm reproduces the committed classes same-day: short 195.0 vs 195.5, ctx2048 39.7 vs 40.2, ctx512 38.0 (reps 37.9/38.0/42.3, within the committed vals 38.1/41.3/42.2); cull rule set at directional resolution, kill-only tier; supersedes the premature pending-evidence receipt
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-15
