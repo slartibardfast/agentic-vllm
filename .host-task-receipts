@@ -206,3 +206,11 @@
     evidence = the repack interleave contract RESOLVED and term-verified (16384/16384 terms by a NumPy oracle against a reference grouped GEMM): closed-form packed-word index map, dequant LUT constants (0xea LUT, hsub2 0x64086408, hfma2 0x2c00/0xd480 - the 16x absorbed by x2^-4 on GPTQ, correcting the premultiplied-scale phrasing), fragment wiring (th=4c+t, zero register shuffling), scale 8x8 transpose permutation; written into marlin-contract.md
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-16
+
+[receipt "plan/0011#kernel-author"]
+    disposition = done
+    verify = cd software/vllm/sm75-marlin && PATH=/opt/cuda/bin:$PATH nvcc -arch=sm_75 -O3 -c turing_lab/turing_w4a16_regdeq.cu -o /dev/null
+    inputs = software/vllm/sm75-marlin/turing_lab/turing_w4a16_regdeq.cu
+    evidence = 386-line kernel authored per the resolved contract: incumbent-layout int4 consumption (th=4c+t lane mapping, zero shuffle), hsub2/hfma2 register dequant (source-verbatim constants; the precomputed-addend variant rejected per dequant.h accuracy warning), permuted scale fragments (orig column q at stored half 8*(q%8)+q/8, verified vs marlin_utils), double-buffered BK128 staging with all-nibble-8 partial-K sentinel, m16n8k8 double issue, fp32 accum; PTX spot-check 16 mma + 16 lop3, zero cp.async/shfl/ldmatrix; standalone compile rc=0; OPEN: act-order, split-K, bias (v1 scope)
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-16
