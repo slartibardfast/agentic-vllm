@@ -198,3 +198,11 @@
     evidence = Front A closed: champion moved to 42.3/40.2/202.6 via the ledger-priced empty-split guard (paired A/B, adjudicated benign); all plan/0010 tasks receipted; lane pushed c3c9154c17 with pin moved; Front B (plan/0011) authored and its CPU work begins per the two-front directive
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-16
+
+[receipt "plan/0011#repack-study"]
+    disposition = done
+    verify = attested operator
+    inputs = software/vllm/sm75-marlin/plan/0002-turing-marlin-backend/marlin-contract.md
+    evidence = the repack interleave contract RESOLVED and term-verified (16384/16384 terms by a NumPy oracle against a reference grouped GEMM): closed-form packed-word index map, dequant LUT constants (0xea LUT, hsub2 0x64086408, hfma2 0x2c00/0xd480 - the 16x absorbed by x2^-4 on GPTQ, correcting the premultiplied-scale phrasing), fragment wiring (th=4c+t, zero register shuffling), scale 8x8 transpose permutation; written into marlin-contract.md
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-16
