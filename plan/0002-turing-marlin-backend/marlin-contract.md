@@ -224,5 +224,5 @@ host-note paraphrase; nothing depends on it). The fork's own opt
 kernels use a DIFFERENT self-defined repack (even/odd nibble planes,
 sQE/sQO) - disjoint design space; a checkpoint-compatible kernel must
 emit the layout above. The incumbent epilogue (D->C global mapping)
-was not traced; a new kernel writes its own epilogue, and the
-term-level check proves everything up to the accumulator.
+was left untraced. A new kernel writes its own epilogue anyway, and
+the term-level check proves everything up to the accumulator.
