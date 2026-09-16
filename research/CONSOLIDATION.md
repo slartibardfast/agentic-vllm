@@ -209,10 +209,18 @@ non-compounding, the 4B K-tree all-negative (0.44-0.91), and the K1
 ordering inversion is real (stock 1.32/1.13 vs champion 1.06/0.87) -
 spec decode favors the stock path everywhere on this engine. INT8 is
 a measured closed lane (no headroom, W8 weight bytes lose to W4).
-What remains live for a future window: the engine-inversion
-mechanism (chrome-trace diff), the days-grade register-dequant+repack
-W4A16 surgery (its own milestone), and the 4B deployment shape on
-its stock-path MTP numbers.
+2026-09-16 UPDATE (plan/0010 window): the ctx512 gap closed by a
+third. The nsys decode-step ledger priced the walk kernel at
+6.96 ms/step with the block table max_model_len-wide - ~92 pct of
+split CTAs empty at real contexts, each emitting zero partials the
+combine never reads. The empty-split guard (one line) is a paired
+A/B WIN: NEW STANDING CHAMPION 42.3/40.2/202.6 (floor 0.76, 0.84 of
+the TRITON baseline at ctx512; short-row cost mostly recovered;
+ctx512 band collapsed 19.4 to 0.7 pct). What remains live: the
+floor gap (the lm-head GEMM ~3 ms/step and the 54 pct inter-kernel
+idle - shared with the TRITON arm, a separate front), the
+register-dequant+repack W4A16 surgery (plan/0011, open), and the
+4B deployment shape on its stock-path MTP numbers.
 
 ## The last fifth (2026-09-15, plan/0010 corpus complete)
 
@@ -294,7 +302,7 @@ option, survivors only reach the committed protocol) is the operator
 
 | Decision | Blocking evidence |
 |---|---|
-| bridge decode >= the TRITON baseline under graphs (41.3/41.2 vs 50.1) | LEVERS EXHAUSTED at this kernel generation (half2 NO_DIFF, pipelining NEGATIVE); next rung is a new generation (the engine-inversion mechanism, or the W4A16 surgery's kernel) |
+| bridge decode >= the TRITON baseline under graphs (42.3/40.2 vs 50.1 = 0.84) | the floor gap is now the named target: the lm-head GEMM (~3 ms/step) and the 54 pct inter-kernel idle (nsys ledger, LEDGER-DECODE16.md) - shared with the TRITON arm |
 | W2/W3 execution: build vs adopt (Humming) | Humming-on-TU102 gate-0 bench |
 | MXFP4 nibble-LUT build vs skip | NVFP4 gate-0 first (cheaper, same LUT core) |
 | MTP on the 4B champion path | the plan/0009 measurement (does the stock-path compounding transfer) |
