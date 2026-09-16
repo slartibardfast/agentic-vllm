@@ -127,3 +127,37 @@ custom one-shot allreduce is dispatching (FlashInfer AR refuses
 world_size 2; symm-mem refuses cc 7.5; NVLS unavailable) - the AR
 lever stays below the floor, subject to the profile ledger's time
 share.
+
+## Execution record (2026-09-16, the 12h window)
+
+- #gate1-validate DONE (receipted, superseding the premature entry):
+  the corrected split-env arm reproduces the committed classes
+  same-day (short 195.0 vs 195.5, ctx2048 39.7 vs 40.2, ctx512 38.0
+  within the committed 38.1-46.2 spread). Gate-1 is licensed as the
+  kill-only cull tier.
+- #pps-resweep DONE (receipted): PPS1 killed at the short row
+  (-15 pct, 165.1 vs 195.0) with a sub-band ctx512 hint (+7.9 pct
+  paired); PPS4 skipped as the uninformative direction.
+- #step-profile DONE (receipted): the nsys decode-step ledger (16
+  steps, both arms, ctx512) - 24.0 ms/step span, 46 pct kernel-busy;
+  the WALK KERNEL is the top item at 6.96 ms/step (666 us avg, grid
+  z=196) - 4x its isolated duration, because the engine's block
+  table is max_model_len-wide: at ctx512 about 180 of 196 split CTAs
+  own zero pages and each still emits 6 KB of zero partials the
+  (correctly guarded) combine never reads. Secondary ledger items:
+  the LM-head GEMM ~3 ms/step (shared with the TRITON arm - part of
+  the floor gap, not the bridge gap), GDN recurrent 1.6 ms/step,
+  combine 0.29 ms/step; the custom one-shot allreduce is dispatching
+  (dispatch read at window open). Files:
+  turing_lab/results/step-profile/nsys-*/.
+- #surgeries IN PROGRESS: dynamic split sizing ran the full train
+  first (oracle 72/72 both paths, paired committed A/B) and landed
+  NO_DIFF on every row (194.2/42.2/40.9 vs 194.1/42.3/40.9) - the
+  gate-1 ctx512 signal was a low-day artifact; patch preserved
+  (dyn-splits.patch), champion unchanged. THE REAL SURGERY from the
+  ledger: the empty-split guard (one line - return before emit when
+  p_begin owns no pages; combine provably never reads those slots).
+  Oracle 36/36 both batteries; gate-0 6/8 adjudicated benign by the
+  dual-arm discriminator (max worst-row 0.0625, mean 0.004 - the
+  standing tie-break class); the paired committed A/B is in flight
+  against today's flat arm (194.1/42.3/40.9).

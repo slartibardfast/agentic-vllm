@@ -170,3 +170,17 @@
     evidence = corrected split-env arm reproduces the committed classes same-day: short 195.0 vs 195.5, ctx2048 39.7 vs 40.2, ctx512 38.0 (reps 37.9/38.0/42.3, within the committed vals 38.1/41.3/42.2); cull rule set at directional resolution, kill-only tier; supersedes the premature pending-evidence receipt
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-15
+
+[receipt "plan/0010#pps-resweep"]
+    disposition = done
+    verify = attested operator
+    evidence = PPS1 gate-1: short -15 pct (killed), ctx512 +7.9 pct paired (sub-band signal -> fed the dynamic-split design); PPS4 skipped (uninformative direction); gate1-pps1.log
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-16
+
+[receipt "plan/0010#step-profile"]
+    disposition = done
+    verify = attested operator
+    evidence = nsys decode-step ledger both backends: walk kernel 6.96 ms/step at grid z=196 with ~92 pct empty split CTAs (block table is max_model_len-wide; empty splits emit zeros the guarded combine never reads); 46 pct kernel-busy; LM-head ~3 ms/step and GDN recurrent 1.6 ms/step named; step-profile/nsys-*/
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-16
