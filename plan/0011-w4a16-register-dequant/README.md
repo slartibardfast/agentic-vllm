@@ -76,3 +76,26 @@ Ledger and records current, pushes and pins, receipts.
 
 - depends: #gemm-ab
 - verify: attested operator
+
+## Execution record (2026-09-16)
+
+- #kernel-author DONE (receipted): 386-line v1, compile rc=0, PTX
+  confirms the design (16 mma.sync m16n8k8, 16 lop3, zero
+  cp.async/shfl/ldmatrix). Consumes the incumbent repacked layout
+  directly (checkpoint-compatible - the engine's existing repack
+  feeds it). Design notes: hsub2/hfma2 dequant chosen over the
+  precomputed-addend form on dequant.h's own accuracy warning; the
+  per-warp n8 partition and direct-half2 A loads inherited from the
+  fork's validated opt lineage.
+- #oracle-bench DONE (receipted): the battery passed 6/6 at FIRST
+  GPU CONTACT - the term-verified contract produced an exact kernel
+  with zero numerics debugging. The M sweep measured M512 at
+  17.04 TFLOP/s: below the fork's seated 23.50 and the incumbent's
+  51-57, so the kill-line holds and no committed A/B runs for v1.
+  One falsification on the way: the author's flagged A-staging
+  store conflict was treated with a pad change (+8 to +4 halves)
+  that cost 26 pct at M512 (the +8 pad's row-start spread was
+  buying the read side) - reverted, documented in-source.
+  #gemm-ab stays pending a v2 that clears the kill-line; the v2
+  lever list is the incumbent's own remaining tricks: multi-stage
+  pipeline depth, BN128-class wider tiles, split-K for small M.

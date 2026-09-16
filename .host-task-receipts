@@ -214,3 +214,10 @@
     evidence = 386-line kernel authored per the resolved contract: incumbent-layout int4 consumption (th=4c+t lane mapping, zero shuffle), hsub2/hfma2 register dequant (source-verbatim constants; the precomputed-addend variant rejected per dequant.h accuracy warning), permuted scale fragments (orig column q at stored half 8*(q%8)+q/8, verified vs marlin_utils), double-buffered BK128 staging with all-nibble-8 partial-K sentinel, m16n8k8 double issue, fp32 accum; PTX spot-check 16 mma + 16 lop3, zero cp.async/shfl/ldmatrix; standalone compile rc=0; OPEN: act-order, split-K, bias (v1 scope)
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-16
+
+[receipt "plan/0011#oracle-bench"]
+    disposition = done
+    verify = attested operator
+    evidence = oracle 6/6 PASS at first GPU contact (the term-verified contract delivered exact numerics); M sweep measured: M512 = 17.04 TFLOP/s vs 23.50 self and 51-57 incumbent - BELOW the kill-line, no committed A/B for v1. The plus-4 pad trial (the author's flagged bank conflict) falsified at -26 pct and was reverted in-source. v2 lever list banked: the incumbent's multi-stage pipeline depth, wider tiles (BN128), split-K for small M. regdeq-oracle-run1/v11/v1r logs; kernel a687a59315
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-16
