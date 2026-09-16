@@ -184,3 +184,17 @@
     evidence = nsys decode-step ledger both backends: walk kernel 6.96 ms/step at grid z=196 with ~92 pct empty split CTAs (block table is max_model_len-wide; empty splits emit zeros the guarded combine never reads); 46 pct kernel-busy; LM-head ~3 ms/step and GDN recurrent 1.6 ms/step named; step-profile/nsys-*/
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-16
+
+[receipt "plan/0010#surgeries"]
+    disposition = done
+    verify = attested operator
+    evidence = dynamic splits: oracle 72/72, paired committed A/B NO_DIFF (gate-1 ctx512 signal was noise; patch preserved). The ledger-priced WIN: empty-split guard (one line; combine provably never reads skipped slots; oracle 36/36; gate-0 6/8 adjudicated benign, dual-arm 0.0625 max) - paired committed A/B: short 202.6 vs 194.1 (+4.4 pct band-separated), ctx512 42.3 tie with band 19.4->0.7 pct, ctx2048 -1.7 sub-band. NEW CHAMPION 42.3/40.2/202.6 (floor 0.76, 0.84 of TRITON). Lane 22c72d3cb3
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-16
+
+[receipt "plan/0010#close-out"]
+    disposition = done
+    verify = attested operator
+    evidence = Front A closed: champion moved to 42.3/40.2/202.6 via the ledger-priced empty-split guard (paired A/B, adjudicated benign); all plan/0010 tasks receipted; lane pushed c3c9154c17 with pin moved; Front B (plan/0011) authored and its CPU work begins per the two-front directive
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-16

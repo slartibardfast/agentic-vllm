@@ -161,3 +161,14 @@ share.
   dual-arm discriminator (max worst-row 0.0625, mean 0.004 - the
   standing tie-break class); the paired committed A/B is in flight
   against today's flat arm (194.1/42.3/40.9).
+- #surgeries DONE (receipted): two surgeries through the full train.
+  Dynamic split sizing: NO_DIFF (paired committed A/B; the gate-1
+  ctx512 signal was a low-day artifact; patch preserved). The
+  LEDGER-PRICED WIN: the empty-split guard - one line, the combine
+  provably never reads skipped slots - short plus 4.4 pct
+  band-separated (202.6, recovering most of the recorded short-row
+  cost), ctx512 variance collapsed (band 19.4 to 0.7 pct), ctx2048
+  sub-band. NEW STANDING CHAMPION 42.3/40.2/202.6 (floor ratio 0.76,
+  0.84 of the TRITON baseline at ctx512). The nsys ledger files are
+  the record (LEDGER-DECODE16.md distills them; raw trees gitignored
+  at GitHub's limit). Lane 22c72d3cb3, pin moved.
