@@ -149,3 +149,80 @@ no data-dependent allocations, and performs no host synchronization in the
 launch path, which is what CUDA graph capture requires. `thread_k_init`/
 `thread_n_init` may pin a configuration; `sms` may pin the SM count.
 
+
+## The repack interleave contract, RESOLVED (2026-09-16, plan/0011)
+
+Verified term-by-term: the full contract (index map, fragment
+consumption, dequant LUTs, scale permutation) was re-implemented as a
+NumPy oracle against a reference grouped GEMM - 16384/16384 (k-row,
+k, column) terms covered exactly once, every dequantized value
+q-8, every scale on its column. Anchors are the lane worktree's pin
+(file:line under csrc/libtorch_stable/quantization/marlin/ and
+vllm/model_executor/).
+
+### The packed 32-bit word layout (what a repack must emit)
+
+Output tensor: `{size_k/16, size_n*2}` uint32 words; B consumed as
+`const int4*` (16-byte units). 4-bit tile = 16k x 64n = 128 words.
+Output word `W[T,U,th,w]` at linear address
+`T*(2*size_n) + U*128 + th*4 + w` (T = 16-k tile, U = 64-n tile,
+th in [0,32), w in [0,4)), nibble i (bits 4i+3:4i):
+
+| nibble i | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|---|
+| weight (n,k) | (n0,2t) | (n0,8+2t) | (n0+8,2t) | (n0+8,8+2t) | (n0,2t+1) | (n0,9+2t) | (n0+8,2t+1) | (n0+8,9+2t) |
+
+with `n0 = 64U + 16w + c`, `t = th%4`, `c = th/4`, k relative to the
+16-k tile. In byte terms: byte 0 = the (k=2t, k=8+2t) pair of n0;
+byte 1 = the same pair of n0+8; bytes 2/3 = the (2t+1, 9+2t) pairs.
+The (k,k+1) pairing holds per 16-bit extraction (nibbles {0,4} and
+{1,5}); at byte granularity each byte is a (k, k+8) pair of one
+column - CORRECTING the earlier loose phrasing. Act-order (has_perm)
+changes only the source k (src_k = perm[k_idx]); the output map is
+identical. AWQ reaches the same target layout after its nibble
+reversal. Source: gptq_marlin_repack.cu:100-209.
+
+### Dequant (kU4B8 GPTQ path, dequant.h:121-142), LUT (a&b)|c = 0xea
+
+- lo = lop3(q, 0x000f000f, 0x64006400) -> nibbles {0,4} as fp16
+  1024+q; frag_b[0] = hsub2(lo, 0x64086408) -> {q0-8, q4-8} (one SUB
+  removes the exponent bias AND the symmetric zero point).
+- hi = lop3(q, 0x00f000f0, 0x64006400) -> nibbles {1,5} at mantissa
+  bits [7:4] = fp16 1024+16q; frag_b[1] = hfma2(hi, 0x2c00 (2^-4),
+  0xd480 (-72)) -> q-8. CORRECTION: on the GPTQ path the 16x
+  asymmetry is absorbed by the x2^-4 in the hfma2, NOT by
+  premultiplied scales (scales are plain permuted fp16). The pure
+  two-lop3 skip-flop variant (dequant.h:107-119) is the kU4/AWQ mode;
+  a new GPTQ kernel emulating it would use w = (1024+q)*s - 1032*s as
+  one hfma2 with a precomputed addend, or premultiply the odd-half
+  scale by 1/16.
+
+### Fragment wiring (Turing m16n8k8 split, marlin_mma.h:22-35)
+
+The k16 step issues two m16n8k8: {a0,a1}x{b[0]} (lower k8) then
+{a2,a3}x{b[1]} (upper k8), same accumulator. b_quant_0 = the thread's
+repack word j (j selects the 16-n slab at 16j); b_quant_1 = word >> 8.
+dequant(word) -> column n0, k {2t,2t+1}/{8+2t,9+2t}; dequant(word>>8)
+-> column n0+8, same k. Consuming lane (t,c) reads word th = 4c+t -
+the lane's hardware k-pair index equals the repack t: NO register
+shuffling anywhere (marlin_template.h:1234-1245, 1286-1289).
+
+### Scales (fp16, group 128, group_blocks = 8)
+
+marlin_permute_scales (marlin_utils.py:460-481): within each 64
+consecutive scales, stored[p] = orig[perm[p]] with perm[8i+j] = i+8j
+(an 8x8 transpose), applied before launch. In-kernel the per-thread
+scale fragment is one int4 = 8 halves at
+s_sh_rd = 8*((tx/32)%tb_n_warps) + (tx%32)/4, and the permuted layout
+makes half 2j = scale(column 64U+16j+c) and half 2j+1 = scale of
+column+8 exactly (verified for all 2048 (thread,k2,j)).
+
+### Notes
+
+qWeightsDBG does not exist anywhere in the worktree (likely a
+host-note paraphrase; nothing depends on it). The fork's own opt
+kernels use a DIFFERENT self-defined repack (even/odd nibble planes,
+sQE/sQO) - disjoint design space; a checkpoint-compatible kernel must
+emit the layout above. The incumbent epilogue (D->C global mapping)
+was not traced (a new kernel writes its own; the term-level check
+proves everything up to the accumulator).
