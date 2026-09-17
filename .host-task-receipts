@@ -221,3 +221,17 @@
     evidence = oracle 6/6 PASS at first GPU contact (the term-verified contract delivered exact numerics); M sweep measured: M512 = 17.04 TFLOP/s vs 23.50 self and 51-57 incumbent - BELOW the kill-line, no committed A/B for v1. The plus-4 pad trial (the author's flagged bank conflict) falsified at -26 pct and was reverted in-source. v2 lever list banked: the incumbent's multi-stage pipeline depth, wider tiles (BN128), split-K for small M. regdeq-oracle-run1/v11/v1r logs; kernel a687a59315
     tool = host-lifecycle@0.53.0
     recorded = 2026-09-16
+
+[receipt "plan/0011#gemm-ab"]
+    disposition = done
+    verify = attested operator
+    evidence = paired committed A/B, both arms fresh same-day (locked 1455, median-of-20, correctness-gated): SPLIT verdict - regdeq v3 wins the small-M regime (M1 +30 pct, M8 +29, M32 +41 - the serving decode shape), incumbent keeps M>=128 (52.59 vs 28.63 at M512); the M>=128 acceptance NOT met, recorded; regime map + dispatch follow-on named; lane 8a42950ba5
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-17
+
+[receipt "plan/0011#close-out"]
+    disposition = done
+    verify = attested operator
+    evidence = Front B closed at the v3 split: kill-line cleared (+21.8 pct over the seated 23.50), small-M regime won, large-M gap honestly recorded; kernel + oracle + paired arms committed and pushed (lane 8a42950ba5, pin moved); production restored healthy; the dispatch-table integration and the large-M pipeline generation named as follow-ons
+    tool = host-lifecycle@0.53.0
+    recorded = 2026-09-17

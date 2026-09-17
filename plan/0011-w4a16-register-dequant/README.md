@@ -115,3 +115,25 @@ the incumbent's large-M config class amortizes each A/B byte across
 multiple 16-row M tiles; that is the structural difference the
 falsification ledger has pointed at since August. Lane commit: the
 v2 template + falsification record in-source.
+
+## v3 record (2026-09-17): the paired A/B ran — SPLIT verdict
+
+The bounded fix (the permute is per-64-block: absolute stored half
+64U + 8c + 2w'; v2 dropped 64U and used w for w&3) unlocked BN128/S2:
+oracle 6/6 with errors identical to v1 (exact numerics through the
+fix), and the M sweep jumped to 28.63 TFLOP/s at M512 (+68 pct over
+v1, clearing the 23.50 kill-line).
+
+The fully-worked paired committed A/B (both arms fresh same-day,
+locked clocks, median-of-20, correctness-gated) returned a SPLIT:
+- small-M regime FLIPPED TO THE FORK: M1 +30 pct, M8 +29 pct, M32
+  +41 pct — and M<=32 is the serving decode shape;
+- the incumbent keeps large-M decisively (52.59 vs 28.63 at M512,
+  2x — its deep pipeline owns the compute-bound regime);
+- the plan's original acceptance (a WIN at M>=128) is NOT met,
+  recorded as such.
+
+DISPOSITION: the regime map is the deliverable. The named follow-on:
+engine-side dispatch (regdeq for the decode regime M<64, incumbent
+Marlin at M>=64) — engine-lane work, its own task; the large-M gap
+stays open for a pipeline-depth generation. Lane 8a42950ba5.
