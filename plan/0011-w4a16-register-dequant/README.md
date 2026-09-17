@@ -99,3 +99,19 @@ Ledger and records current, pushes and pins, receipts.
   #gemm-ab stays pending a v2 that clears the kill-line; the v2
   lever list is the incumbent's own remaining tricks: multi-stage
   pipeline depth, BN128-class wider tiles, split-K for small M.
+
+## v2 iteration record (2026-09-17)
+
+The v2 levers ran the full train and BOTH falsified at the measured
+shapes: the 3-stage ring at BN64 is numerically correct (battery
+all-pass) but -49 pct at M512 (8.71 TFLOP/s; 2 CTAs/SM costs more
+than prefetch depth buys at this class on sm_75); the BN128 shape
+carried a scale-pairing bug (the derived stored-half mapping omits
+the plus-8U term for warp blocks past the first 64 columns) AND
+runs 1 CTA/SM. The tree defaults now select the measured-best
+BN64/S2 (v1-equivalent, 17.04 M512); the falsified shapes remain
+compile-time selectable. NEXT NAMED LEVER (v3): thread_m_blocks>1 -
+the incumbent's large-M config class amortizes each A/B byte across
+multiple 16-row M tiles; that is the structural difference the
+falsification ledger has pointed at since August. Lane commit: the
+v2 template + falsification record in-source.
